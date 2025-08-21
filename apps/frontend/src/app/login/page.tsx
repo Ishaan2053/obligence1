@@ -6,7 +6,7 @@ export default function LoginPage() {
     return (
         <>
             <main className="flex min-h-screen">
-                <section className="flex w-full flex-col justify-center lg:w-1/2">
+                <section className="flex w-full flex-col justify-center lg:w-1/2 ">
                     <AuthForm variant="login" />
 
                     <span className="text-neutral-400 text-center block mt-4">

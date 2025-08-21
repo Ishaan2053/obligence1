@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function RegisterPage() {
     return (
         <>
-            <main className="flex min-h-screen bg-black">
+            <main className="flex min-h-screen">
                 <section className="flex w-full flex-col justify-center lg:w-1/2">
                     <AuthForm variant="register" />
 
