@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 type Props = {};
@@ -10,7 +11,7 @@ function Footer({}: Props) {
           Obligence
         </div>
         <p className="mt-4 text-center text-sm text-gray-500 lg:mt-0 lg:text-right">
-          Copyright &copy; {new Date().getFullYear()}. All rights reserved.
+          Copyright &copy; {new Date().getFullYear()}. View source code on <Link className="text-muted-foreground hover:underline" href="https://github.com/kyrexi/obligence">GitHub</Link>.
         </p>
       </div>
     </footer>

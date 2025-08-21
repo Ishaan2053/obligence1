@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, ChevronRight, Github } from "lucide-react";
+import { ArrowRight, ChevronRight, Github, SparklesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -26,13 +26,11 @@ return (
         className="mx-auto mb-6 flex justify-center"
         >
         <div className="border-border bg-background/80 inline-flex items-center rounded-full border px-3 py-1 text-sm backdrop-blur-sm">
-            <span className="bg-primary mr-2 rounded-full px-2 py-0.5 text-xs font-semibold text-white">
-            New
-            </span>
+<SparklesIcon className="text-yellow-300/80 mr-2 h-4 w-4" />
             <span className="text-muted-foreground">
-            Introducing our latest component library
+            Transparency Automated
             </span>
-            <ChevronRight className="text-muted-foreground ml-1 h-4 w-4" />
+            {/* <ChevronRight className="text-muted-foreground ml-1 h-4 w-4" /> */}
         </div>
         </motion.div>
 

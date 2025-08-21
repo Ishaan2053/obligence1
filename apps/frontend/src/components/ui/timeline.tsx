@@ -33,12 +33,11 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
       ref={containerRef}
     >
       <div className="max-w-4xl mx-auto py-20 px-4 md:px-8 lg:px-10">
-        <h2 className="text-lg md:text-4xl mb-4 max-w-4xl">
-          Changelog from my journey
+        <h2 className="text-lg md:text-4xl mb-4 max-w-4xl tracking-tighter text-balance ">
+        How Obligence Works: Your Contract, Smarter <br/>In Four Simple Steps
         </h2>
         <p className=" text-sm md:text-base max-w-sm">
-          I&apos;ve been working on Aceternity for the past 2 years. Here&apos;s
-          a timeline of my journey.
+         Discover how Obligence transforms any contract into actionable intelligence. Our four-step process blends powerful AI and expert review, giving you clarity and confidence—fast, easy, and secure for every business need.
         </p>
       </div>
 

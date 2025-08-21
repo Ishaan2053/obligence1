@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
   { name: "Home", href: "/" },
   { name: "Features", href: "/features" },
   { name: "Solutions", href: "/solutions" },
+  { name: "Testimonials", href: "#testimonials" },
 ];
 
 export default function Navbar() {
@@ -104,10 +105,10 @@ export default function Navbar() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-foreground text-lg font-bold">
-                    Acme Inc.
+                Obligence
                   </span>
-                  <span className="text-muted-foreground -mt-1 text-xs">
-                    Build faster
+                  <span className="text-muted-foreground -mt-1 text-xs font-light">
+                    Lightspeed
                   </span>
                 </div>
               </Link>
