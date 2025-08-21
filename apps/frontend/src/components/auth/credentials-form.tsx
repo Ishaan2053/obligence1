@@ -90,29 +90,25 @@ export default function CredentialsForm({ variant }: CredentialsFormProps) {
           </div>
         )}
         <div className="grid gap-2">
-          <Label htmlFor="email" className="text-white">
-            Email
-          </Label>
+          <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             name="email"
             type="email"
             placeholder="email@example.com"
-            className="border-neutral-800 bg-neutral-950 text-white placeholder:text-neutral-400"
+            className=" rounded-full placeholder:text-neutral-400"
             required
             disabled={isLoading}
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="password" className="text-white">
-            Password
-          </Label>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             name="password"
             type="password"
             placeholder="********"
-            className="border-neutral-800 bg-neutral-950 text-white placeholder:text-neutral-400"
+            className=" rounded-full  placeholder:text-neutral-400"
             required
             disabled={isLoading}
           />
@@ -132,7 +128,7 @@ export default function CredentialsForm({ variant }: CredentialsFormProps) {
             />
           </div>
         )}
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
           {isLoading
             ? "Please wait..."
             : variant === "login"

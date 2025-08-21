@@ -20,7 +20,7 @@ const SignInButton = async ({ method }: SignInButtonProps) => {
     >
       <Button
         variant="outline"
-        className="border-neutral-800 bg-neutral-950 text-white hover:bg-neutral-900 w-32 sm:w-40"
+        className="border-neutral-800 rounded-full hover:bg-neutral-900 w-32 sm:w-40"
       >
         {method === "github" ? (
           <LuGithub className="mr-2 h-4 w-4" />
