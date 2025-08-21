@@ -60,8 +60,8 @@ export const CardCarousel: React.FC<CarouselProps> = ({
   return (
     <section className="w-ace-y-4">
       <style>{css}</style>
-      <div className="mx-auto w-full max-w-4xl rounded-[24px] border border-black/5 p-2 shadow-sm md:rounded-t-[44px]">
-        <div className="relative mx-auto flex w-full flex-col rounded-[24px] border border-black/5 bg-neutral-800/5 p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
+      <div className="mx-auto w-full max-w-4xl rounded-2xl p-2 shadow-sm md:rounded-t-[44px]">
+        <div className="relative mx-auto flex w-full flex-col rounded-[24px] border border-black/5  p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
           <div className="flex flex-col justify-center pb-2 pl-4 pt-14 md:items-center">
             <div className="flex gap-2">
               <div>
@@ -106,8 +106,8 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                 {images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <div className="size-full rounded-3xl">
-                        <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
-                            {image.testimonial} </div>
+                        <div className="absolute italic font-light top-2 left-2 z-10 flex items-center gap-2">
+                           "{image.testimonial}"</div>
                       <Image
                         src={image.src}
                         width={500}

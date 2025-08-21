@@ -1,17 +1,39 @@
+"use client";
+
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 export default function CTA() {
   return (
-    <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-[40px] bg-background p-6 sm:p-10 md:p-20">
-      <div className="absolute inset-0 hidden h-full w-full overflow-hidden md:block">
+    <div className="h-screen flex items-center">
+    <div className=" relative mx-auto w-full max-w-4xl h-1/2  overflow-hidden rounded-2xl bg-background p-6 sm:p-10 md:p-20">
+      <div className="pointer-events-none absolute inset-0 hidden h-full w-full overflow-hidden md:block">
         <div className="absolute top-1/2 right-[-45%] aspect-square h-[800px] w-[800px] -translate-y-1/2">
-          <div className="absolute inset-0 rounded-full bg-background/90 opacity-30"></div>
-          <div className="absolute inset-0 scale-[0.8] rounded-full bg-orange-300 opacity-30"></div>
-          <div className="absolute inset-0 scale-[0.6] rounded-full bg-orange-200 opacity-30"></div>
-          <div className="absolute inset-0 scale-[0.4] rounded-full bg-orange-100 opacity-30"></div>
-          <div className="absolute inset-0 scale-[0.2] rounded-full bg-orange-50 opacity-30"></div>
-          <div className="absolute inset-0 scale-[0.1] rounded-full bg-white/50 opacity-30"></div>
+          {[
+            { base: 1, className: "bg-background/90", delay: 0 },
+            { base: 0.8, className: "bg-orange-300", delay: 0.2 },
+            { base: 0.6, className: "bg-orange-200", delay: 0.4 },
+            { base: 0.4, className: "bg-orange-100", delay: 0.6 },
+            { base: 0.2, className: "bg-orange-50", delay: 0.8 },
+            { base: 0.1, className: "bg-white/50", delay: 1.0 },
+          ].map(({ base, className, delay }, i) => (
+            <motion.div
+              key={i}
+              initial={{ scale: base, opacity: 0.3 }}
+              animate={{
+                scale: [base, base + Math.min(0.06, base * 0.2), base],
+                opacity: [0.3, 0.38, 0.3],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay,
+              }}
+              className={cn("absolute inset-0 rounded-full", className)}
+            />
+          ))}
         </div>
       </div>
 
@@ -25,33 +47,29 @@ export default function CTA() {
         </p>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-           <div className="flex items-center justify-center">
-    
-        <Link href='/signup'>
-          <div
-            className={cn(
-              "group cursor-pointer group gap-2  h-[64px] flex items-center p-[11px] rounded-full",
-              
-            )}
-          >
-            <div className="border border-border bg-[#ff3f17]  h-[43px] rounded-full flex items-center justify-center text-white">
-              <p className="font-medium tracking-tight mr-3 ml-2 flex items-center gap-2 justify-center ">
-       Get started
-              </p>
-            </div>
-            <div className="text-[#3b3a3a] group-hover:ml-2  ease-in-out transition-all size-[26px] flex items-center justify-center rounded-full border-2 border-[#3b3a3a]  ">
-              <ArrowRight
-                size={18}
-                className="group-hover:-rotate-45 ease-in-out transition-all "
-              />
-            </div>
+          <div className="flex items-center justify-center">
+            <Link href="/signup">
+              <div
+                className={cn(
+                  "group cursor-pointer group gap-2  h-[64px] flex items-center p-[11px] rounded-full"
+                )}
+              >
+                <div className="border border-border bg-[#ff3f17]  h-[43px] rounded-full flex items-center justify-center text-white">
+                  <p className="font-medium tracking-tight mr-3 ml-2 flex items-center gap-2 justify-center ">
+                    Get started
+                  </p>
+                </div>
+                <div className="text-[#3b3a3a] group-hover:ml-2  ease-in-out transition-all size-[26px] flex items-center justify-center rounded-full border-2 border-[#3b3a3a]  ">
+                  <ArrowRight
+                    size={18}
+                    className="group-hover:-rotate-45 ease-in-out transition-all "
+                  />
+                </div>
+              </div>
+            </Link>
           </div>
-        </Link>
-     
-    </div>
-
         </div>
       </div>
-    </div>
+    </div></div>
   );
 }

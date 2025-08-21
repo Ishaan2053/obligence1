@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { name: "Features", href: "/features" },
   { name: "Solutions", href: "/solutions" },
   { name: "Testimonials", href: "#testimonials" },
+  { name: "Pricing", href: "#pricing" }
 ];
 
 export default function Navbar() {
@@ -130,7 +131,7 @@ export default function Navbar() {
                   <Link
                     prefetch={false}
                     href={item.href}
-                    className="text-foreground/80 hover:text-foreground relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200"
+                    className="text-foreground/80 hover:text-foreground relative rounded-lg px-4 py-2 text-sm font-light transition-colors duration-200"
                   >
                     {hoveredItem === item.name && (
                       <motion.div
