@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/sidebar";
-import Header from "@/components/dashboard/header";
+import Header from "@/components/dashboard/profileCard";
 
 export const metadata = {
   title: "Dashboard - Obligence | AI-powered legal document extraction and review",
