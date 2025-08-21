@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Dict
 from bson import ObjectId
+from datetime import datetime
 
 
 # Helper to convert ObjectId to str
@@ -20,12 +21,45 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
-class ContractModel(BaseModel):
+
+
+class ContractAnalysisJobModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id")
+    contract_id: str
     user: str
-    metadata: Dict[str, str]
-    file_url: str
-    status: str = "processing"
+    status: str = "pending"  # pending, extracting, analyzing, done, failed
+    error: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
+
+
+
+class ContractAnalysisResultModel(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id")
+    contract_id: str
+    user: str
+    result: Dict
+    created_at: datetime = Field(default_factory=datetime.now)
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
+
+
+
+class ClarificationModel(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id")
+    contract_id: str
+    question: str
+    response: Optional[str] = None
+    status: str = "open"  # open, resolved
+    priority: str = "medium"
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    resolved_at: Optional[datetime] = None
 
     class Config:
         json_encoders = {ObjectId: str}

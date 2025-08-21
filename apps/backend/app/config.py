@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 
+
 class Settings:
     def __init__(self):
         load_dotenv(".env.local")
@@ -9,5 +10,9 @@ class Settings:
         self.S3_REGION = os.getenv("S3_REGION")
         self.S3_ACCESS_KEY_ID = os.getenv("S3_ACCESS_KEY_ID")
         self.S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
+        self.PORTIA_API_KEY = os.getenv("PORTIA_API_KEY")
+        self.GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+        self.MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
 
 settings = Settings()
