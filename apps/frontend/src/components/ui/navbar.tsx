@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, easeInOut } from "framer-motion";
-import { Menu, X, ArrowRight, Zap, Search } from "lucide-react";
+import { Menu, X, ArrowRight, Zap, Search, ShredderIcon } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface NavItem {
   name: string;
@@ -21,6 +23,9 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
+      const { data: session } = useSession();
+    const user = session?.user;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,10 +103,9 @@ export default function Navbar() {
                 className="flex items-center space-x-3"
               >
                 <div className="relative">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 via-rose-600 to-rose-700 shadow-lg">
-                    <Zap className="h-5 w-5 text-white" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 shadow-lg">
+                    <ShredderIcon className="h-5 w-5 text-white" />
                   </div>
-                  <div className="absolute -top-1 -right-1 h-3 w-3 animate-pulse rounded-full bg-green-400"></div>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-foreground text-lg font-bold">
@@ -130,7 +134,7 @@ export default function Navbar() {
                   >
                     {hoveredItem === item.name && (
                       <motion.div
-                        className="bg-muted absolute inset-0 rounded-lg"
+                        className="bg-muted absolute inset-0 rounded-full"
                         layoutId="navbar-hover"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -246,6 +250,7 @@ export default function Navbar() {
                   </Link>
                 </motion.div>
               </div>
+              
             </motion.div>
           </>
         )}
