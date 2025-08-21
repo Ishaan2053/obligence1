@@ -18,6 +18,18 @@ async def upload_contract(
     metadata: str = Form(...),  # JSON string
     user: str = Form(...),
 ):
+    """
+    Uploads a contract file to S3 and saves metadata to MongoDB.
+
+    **Request Body**
+    - `file`: The contract file to upload (multipart/form-data)
+    - `metadata`: JSON string containing contract metadata
+    - `user`: The user uploading the contract
+
+    **Response**
+    - `contract_id`: The ID of the uploaded contract
+    - `status`: The status of the upload (e.g., "processing/extracted/failed")
+    """
     # Parse metadata JSON
     metadata_dict = json.loads(metadata)
 
