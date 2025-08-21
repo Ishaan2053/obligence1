@@ -22,12 +22,15 @@ import {
     NotepadText,
     DumbbellIcon,
     Cog,
+    ShredderIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import SettingsDialog from "./settings";
+import Header from "./profileCard";
 
 export function AppSidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -36,14 +39,14 @@ export function AppSidebar() {
 
 
     return (
-        <Sidebar collapsible="icon" className="border-r-1 border-r-neutral-700/30 dark:border-r-white/20">
+        <Sidebar collapsible="icon" className="">
             <SidebarHeader>
                 <Link
-                    href="/"
+                    href="/dashboard"
                     className="flex items-center justify-center py-3 gap-2 flex-row w-full"
                 >
-                    <div className="bg-primary rounded-full shadow-xl text-white p-1">
-                        <Cog className=" m-0 h-6 p-0 rounded-full w-full" />
+                    <div className=" rounded-full shadow-xl p-1">
+                        <ShredderIcon className=" m-0 h-6 p-0 rounded-full w-full" />
                     </div>
                     {isSidebarOpen && (
                         <AnimatePresence>
@@ -52,9 +55,9 @@ export function AppSidebar() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ delay: 0.2 }}
-                                className="text-2xl font-bold"
+                                className="text-2xl tracking-tighter text-balance font-semibold"
                             >
-                                Trafyx
+                                Obligence
                             </motion.span>
                         </AnimatePresence>
                     )}
@@ -129,7 +132,7 @@ export function AppSidebar() {
                         </Link>{" "}
                     </SidebarMenuItem> */}
                     <SidebarMenuItem>
-                        <SidebarMenuButton
+                        {/* <SidebarMenuButton
                             tooltip="Settings"
                             isActive={pathname.includes("/dashboard/settings")}
                             asChild
@@ -139,7 +142,8 @@ export function AppSidebar() {
                                 <Settings className="h-4 w-4" />
                                 <span>Settings</span>
                             </Link>
-                        </SidebarMenuButton>
+                        </SidebarMenuButton> */}
+                        <SettingsDialog/>
                     </SidebarMenuItem>
                     <SidebarMenuItem className="border-t border-t-neutral-700/30 dark:border-t-white/20">
                         <SidebarMenuButton
@@ -157,11 +161,9 @@ export function AppSidebar() {
                             <span>Collapse Sidebar</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+
                     <SidebarMenuItem>
-                        {/* <ThemeToggle /> */}
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton
+                        {/* <SidebarMenuButton
                             tooltip="Logout"
                             onClick={() => {
                                 signOut({ redirect: true, redirectTo: "/login" });
@@ -169,7 +171,8 @@ export function AppSidebar() {
                         >
                             <LogOut className="h-4 w-4" />
                             <span>Logout</span>
-                        </SidebarMenuButton>
+                        </SidebarMenuButton> */}
+                        {/* <Header/> */}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
