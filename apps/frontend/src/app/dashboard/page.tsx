@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { Separator } from "@/components/ui/separator";
 import { Sheet } from "lucide-react";
@@ -9,15 +10,25 @@ function page({}: Props) {
   const { data: session } = useSession();
   const user = session?.user;
   return (
-    <div className="max-w-5xl mx-auto space-y-6 justify-center p-4 md:p-5 lg:p-12 pt-5 md:pt-8 lg:pt-20 2xl:pt-28">
-      <section>
+    <div className="max-w-5xl mx-auto space-y-6 justify-center">
+      <motion.section
+        initial={{ opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -24 }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+      >
         <h1 className="font-light text-sm text-muted-foreground">
           My Workspace
         </h1>
         <h2 className="font-semibold text-2xl">Welcome, {user?.name}!</h2>
-      </section>
+      </motion.section>
 
-      <section>
+      <motion.section
+        initial={{ opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -24 }}
+        transition={{ duration: 0.22, ease: "easeOut", delay: 0.05 }}
+      >
         {/* cards */}
         <div className="grid grid-cols-5 gap-4">
           {[
@@ -59,10 +70,16 @@ function page({}: Props) {
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
       <Separator className="my-6" />
 
-      <section className="flex flex-col md:flex">
+      <motion.section
+        className="flex flex-col md:flex"
+        initial={{ opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -24 }}
+        transition={{ duration: 0.22, ease: "easeOut", delay: 0.1 }}
+      >
         <div className="w-1/2 space-y-6">
           <h2 className="font-semibold text-2xl">Recent Activity</h2>
           <div className="space-y-4">
@@ -105,7 +122,7 @@ function page({}: Props) {
         </div>
 
         <div className="w-1/2"></div>
-      </section>
+  </motion.section>
     </div>
   );
 }
