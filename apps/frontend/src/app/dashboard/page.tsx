@@ -30,7 +30,7 @@ function page({}: Props) {
         transition={{ duration: 0.22, ease: "easeOut", delay: 0.05 }}
       >
         {/* cards */}
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-4">
           {[
             {
               title: "Document 1",
@@ -66,7 +66,7 @@ function page({}: Props) {
               transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
               className="flex flex-col items-center rounded-2xl outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring"
             >
-              <div className="border rounded-2xl h-40 w-40 overflow-hidden bg-card">
+              <div className="border rounded-2xl size-20 md:h-40 md:w-40 overflow-hidden bg-card">
                 <motion.img
                   src={document.imageUrl}
                   alt={document.title}
@@ -75,7 +75,7 @@ function page({}: Props) {
                   transition={{ duration: 0.2, ease: "easeOut" }}
                 />
               </div>
-              <h3 className="mt-2 text-center font-semibold">{document.title}</h3>
+              <h3 className="mt-2 text xs md:text-base text-center font-semibold">{document.title}</h3>
             </motion.a>
           ))}
         </div>
@@ -89,7 +89,7 @@ function page({}: Props) {
         exit={{ opacity: 0, x: -24 }}
         transition={{ duration: 0.22, ease: "easeOut", delay: 0.1 }}
       >
-        <div className="w-1/2 space-y-6">
+        <div className="w-full md:w-1/2 space-y-6">
           <h2 className="font-semibold text-2xl">Recent Activity</h2>
           <div className="space-y-4">
             {[
