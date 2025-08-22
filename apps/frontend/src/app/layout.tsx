@@ -25,13 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Providers>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
-      </Providers>
     </html>
   );
 }

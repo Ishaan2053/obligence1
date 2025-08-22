@@ -62,16 +62,14 @@ export const CardCarousel: React.FC<CarouselProps> = ({
       <style>{css}</style>
       <div className="mx-auto w-full max-w-4xl rounded-2xl p-2 shadow-sm md:rounded-t-[44px]">
         <div className="relative mx-auto flex w-full flex-col rounded-[24px] border border-black/5  p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
-          <div className="flex flex-col justify-center pb-2 pl-4 pt-14 md:items-center">
-            <div className="flex gap-2">
-              <div>
-                <h3 className="text-4xl opacity-85 tracking-tight">
-                  Testimonials
-                </h3>
-                <p>Hear from our customers.</p>
-              </div>
-            </div>
-          </div>
+           <div className="max-w-4xl mx-auto py-20 px-4 md:px-8 lg:px-10">
+        <h2 className="text-lg md:text-7xl mb-4 max-w-4xl tracking-tighter text-balance ">
+        Don't just take our word for it... <br/><span className="tracking-tighter text-balance text-transparent from-primary/10 via-foreground/85 to-foreground/50 bg-gradient-to-tl bg-clip-text">See what others are saying!</span>
+        </h2>
+        <p className=" text-sm md:text-base max-w-sm">
+         Discover why our users are absolutely raving about us! These are genuine experiences from real people who've unlocked the magic.
+        </p>
+      </div>
 
           <div className="flex w-full items-center justify-center gap-4">
             <div className="w-full">
