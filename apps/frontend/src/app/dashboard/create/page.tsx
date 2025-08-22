@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -72,6 +74,9 @@ function Page({}: Props) {
   const [step, setStep] = React.useState<1 | 2>(1);
   const totalSteps = 2;
   const progressValue = ((step - 1) / totalSteps) * 100; // show progress after completing a step
+  const [tag, setTag] = React.useState<
+    "none" | "draft" | "confidential" | "internal" | "public"
+  >("none");
   return (
     <div className="space-y-6">
       {/* HEADER */}
@@ -122,6 +127,78 @@ function Page({}: Props) {
                   placeholder="Enter document description"
                   className="mb-4"
                 />
+                <div className="flex items-center gap-3">
+                  <Label htmlFor="tag-none">Document Tag</Label>
+                  {tag !== "none" && (
+                    <Badge variant="outline" className="capitalize rounded-full">
+                      {tag}
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <RadioGroup
+                    value={tag}
+                    onValueChange={(v) =>
+                      setTag(
+                        (v as
+                          | "none"
+                          | "draft"
+                          | "confidential"
+                          | "internal"
+                          | "public") || "none"
+                      )
+                    }
+                    className="grid grid-cols-2 gap-4"
+                  >
+                    {/* Hidden default option */}
+                    <RadioGroupItem
+                      value="none"
+                      id="tag-none"
+                      className="hidden"
+                    />
+                    {/* Visible options */}
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem id="tag-draft" value="draft" />
+                      <Label htmlFor="tag-draft" className="cursor-pointer">
+                        Draft
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem
+                        id="tag-confidential"
+                        value="confidential"
+                      />
+                      <Label
+                        htmlFor="tag-confidential"
+                        className="cursor-pointer"
+                      >
+                        Confidential
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem id="tag-internal" value="internal" />
+                      <Label htmlFor="tag-internal" className="cursor-pointer">
+                        Internal
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem id="tag-public" value="public" />
+                      <Label htmlFor="tag-public" className="cursor-pointer">
+                        Public
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                  {tag !== "none" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setTag("none")}
+                      className="shrink-0"
+                    >
+                      Clear tag
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="w-1/2">
                 <div className="border-2 border-dashed border-border rounded-2xl p-6 flex flex-col items-center justify-center h-72 mt-4">
