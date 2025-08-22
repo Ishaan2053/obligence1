@@ -9,7 +9,7 @@ function page({}: Props) {
   const { data: session } = useSession();
   const user = session?.user;
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 justify-center p-4 md:p-5 lg:p-12 pt-5 md:pt-8 lg:pt-20 2xl:pt-28">
       <section>
         <h1 className="font-light text-sm text-muted-foreground">
           My Workspace
@@ -66,8 +66,7 @@ function page({}: Props) {
         <div className="w-1/2 space-y-6">
           <h2 className="font-semibold text-2xl">Recent Activity</h2>
           <div className="space-y-4">
-            {
-              [
+            {[
               {
                 title: "Document 1",
                 editedTime: "2 hours ago",
@@ -88,21 +87,20 @@ function page({}: Props) {
                 title: "Document 5",
                 editedTime: "1 week ago",
               },
-              ].map((activity, i) => (
+            ].map((activity, i) => (
               <div
                 key={i}
                 className="flex items-center gap-2 text-sm text-muted-foreground"
               >
                 <Sheet className="text-foreground rounded-full h-8 w-8" />
                 <div className="flex flex-col">
-                <h4 className="font-semibold">{activity.title}</h4>
-                <p className="text-xs text-muted-foreground italic">
-                  Edited {activity.editedTime}
-                </p>
+                  <h4 className="font-semibold">{activity.title}</h4>
+                  <p className="text-xs text-muted-foreground italic">
+                    Edited {activity.editedTime}
+                  </p>
                 </div>
               </div>
-              ))
-            }
+            ))}
           </div>{" "}
         </div>
 

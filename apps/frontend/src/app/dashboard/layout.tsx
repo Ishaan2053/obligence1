@@ -14,7 +14,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <AppSidebar />
 
         <main className="md:flex-1 space-y-2 overflow-hidden relative z-0">
-          <Header />
           <div className="flex items-center justify-between border-b">
             <SidebarTrigger className="flex md:hidden h-full" />
           </div>
