@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,13 +8,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { auth, signOut } from "@/auth";
-
+import { useSession } from "next-auth/react";
 import { LogOut, User } from "lucide-react";
 import SettingsDialog from "./settings";
-
-export default async function Header() {
-  const session = await auth();
+import { signOut } from "next-auth/react";
+export default function Header() {
+  const { data: session } = useSession();
   const user = session?.user as {
     image?: string | null;
     name?: string | null;
@@ -53,20 +53,18 @@ export default async function Header() {
             <DropdownMenuItem asChild>
               <SettingsDialog />
             </DropdownMenuItem>
-            <DropdownMenuItem className="p-2 m-1" asChild>
-              <form
-                className="w-full"
-                action={async () => {
-                  "use server";
-                  await signOut();
-                }}
-              >
-                <button className="w-full text-left hover:text-red-500 transition flex items-center">
-                  {" "}
-                  <LogOut className="mr-4" />
-                  Logout
-                </button>
-              </form>
+            <DropdownMenuItem
+              className="p-2 m-1"
+              asChild
+              onClick={() => {
+                signOut({ redirect: true, redirectTo: "/login" });
+              }}
+            >
+              <button className="w-full text-left hover:text-red-500 transition flex items-center">
+                {" "}
+                <LogOut className="mr-4" />
+                Logout
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
