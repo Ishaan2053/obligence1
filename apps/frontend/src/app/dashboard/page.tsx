@@ -34,27 +34,27 @@ function page({}: Props) {
           {[
             {
               title: "Document 1",
-              imageUrl: "URL1",
+              imageUrl: "/test.jpg",
               link: "/document1",
             },
             {
               title: "Document 2",
-              imageUrl: "URL2",
+              imageUrl: "/test.jpg",
               link: "/document2",
             },
             {
               title: "Document 3",
-              imageUrl: "URL3",
+              imageUrl: "/test.jpg",
               link: "/document3",
             },
             {
               title: "Document 4",
-              imageUrl: "URL4",
+              imageUrl: "/test.jpg",
               link: "/document4",
             },
             {
               title: "Document 5",
-              imageUrl: "URL5",
+              imageUrl: "/test.jpg",
               link: "/document5",
             },
           ].map((document, i) => (
