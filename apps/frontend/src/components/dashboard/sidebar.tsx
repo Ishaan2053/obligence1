@@ -54,7 +54,7 @@ export function AppSidebar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ delay: 0.2 }}
-                className="text-2xl tracking-tighter text-balance font-semibold"
+                className="text-2xl tracking-widest text-balance font-semibold"
               >
                 Obligence
               </motion.span>
@@ -62,16 +62,17 @@ export function AppSidebar() {
           )}
         </Link>
       </SidebarHeader>
-      <SidebarContent className="px-2">
-        <SidebarMenu className="border-t border-t-neutral-700/30 dark:border-t-white/20">
+      <SidebarContent className="px-2 overflow-hidden">
+        <SidebarSeparator className=""/>
+        <SidebarMenu className="">
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Create New Document"
-              isActive={pathname.includes("/dashboard/add")}
+              isActive={pathname.includes("/dashboard/create")}
               asChild
               className="flex items-center"
             >
-              <Link href="/dashboard/add">
+              <Link href="/dashboard/create">
                 <PlusCircleIcon className="h-4 w-4" />
                 <span>Create New Document</span>
               </Link>
