@@ -33,8 +33,8 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
       ref={containerRef}
     >
       <div className="max-w-4xl mx-auto py-20 px-4 md:px-8 lg:px-10">
-        <h2 className="text-lg md:text-4xl mb-4 max-w-4xl tracking-tighter text-balance ">
-        How Obligence Works: Your Contract, Smarter <br/>In Four Simple Steps
+        <h2 className="text-lg md:text-7xl mb-4 max-w-4xl tracking-tighter text-balance ">
+        How Obligence Works: Your Contract, Smarter <br/>In <span className="tracking-tighter text-balance text-transparent from-primary/10 via-foreground/85 to-foreground/50 bg-gradient-to-tl bg-clip-text">Four Simple Steps</span>
         </h2>
         <p className=" text-sm md:text-base max-w-sm">
          Discover how Obligence transforms any contract into actionable intelligence. Our four-step process blends powerful AI and expert review, giving you clarity and confidence — fast, easy, and secure for every business need.
