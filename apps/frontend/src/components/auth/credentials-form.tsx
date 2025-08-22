@@ -83,7 +83,7 @@ export default function CredentialsForm({ variant }: CredentialsFormProps) {
               name="name"
               type="text"
               placeholder="John Doe"
-              className="border-neutral-800 bg-neutral-950 text-white placeholder:text-neutral-400"
+              className=" text-white placeholder:text-neutral-400 rounded-full"
               required
               disabled={isLoading}
             />
@@ -123,7 +123,7 @@ export default function CredentialsForm({ variant }: CredentialsFormProps) {
               name="imageSrc"
               type="url"
               placeholder="https://example.com/image.jpg"
-              className="border-neutral-800 bg-neutral-950 text-white placeholder:text-neutral-400"
+              className="border-neutral-800 text-white placeholder:text-neutral-400 rounded-full"
               disabled={isLoading}
             />
           </div>
