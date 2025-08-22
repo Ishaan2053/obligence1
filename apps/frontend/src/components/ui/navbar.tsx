@@ -104,8 +104,8 @@ export default function Navbar() {
                 className="flex items-center space-x-3"
               >
                 <div className="relative">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 shadow-lg">
-                    <ShredderIcon className="h-5 w-5 text-white" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full  shadow-lg">
+                    <ShredderIcon className="h-7 w-7 text-white" />
                   </div>
                 </div>
                 <div className="flex flex-col">
@@ -113,7 +113,7 @@ export default function Navbar() {
                 Obligence
                   </span>
                   <span className="text-muted-foreground -mt-1 text-xs font-light">
-                    Lightspeed
+                    Lightspeed Insights
                   </span>
                 </div>
               </Link>
@@ -172,7 +172,7 @@ export default function Navbar() {
                 <Link
                   prefetch={false}
                   href="/signup"
-                  className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center space-x-2 rounded-full px-5 py-2.5 text-sm font-medium shadow-sm transition-all duration-200"
+                  className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center space-x-2 px-5 py-2.5 text-sm font-medium shadow-sm transition-all duration-200 rounded-full"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="h-4 w-4" />
@@ -244,7 +244,7 @@ export default function Navbar() {
                   <Link
                     prefetch={false}
                     href="/signup"
-                    className="bg-foreground text-background hover:bg-foreground/90 block w-full rounded-lg py-3 text-center font-medium transition-all duration-200"
+                    className="bg-foreground text-background hover:bg-foreground/90 block w-full rounded-full py-3 text-center font-medium transition-all duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Get Started
