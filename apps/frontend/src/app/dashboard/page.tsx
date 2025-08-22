@@ -58,16 +58,25 @@ function page({}: Props) {
               link: "/document5",
             },
           ].map((document, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <a href={document.link}>
-                <img
+            <motion.a
+              key={i}
+              href={document.link}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
+              className="flex flex-col items-center rounded-2xl outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring"
+            >
+              <div className="border rounded-2xl h-40 w-40 overflow-hidden bg-card">
+                <motion.img
                   src={document.imageUrl}
                   alt={document.title}
-                  className="border rounded-2xl h-40 w-40"
+                  className="size-full object-cover"
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                 />
-                <h3 className="text-center font-semibold">{document.title}</h3>
-              </a>
-            </div>
+              </div>
+              <h3 className="mt-2 text-center font-semibold">{document.title}</h3>
+            </motion.a>
           ))}
         </div>
       </motion.section>
@@ -105,18 +114,23 @@ function page({}: Props) {
                 editedTime: "1 week ago",
               },
             ].map((activity, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="flex items-center gap-2 text-sm text-muted-foreground"
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.99 }}
+                transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.6 }}
+                className="flex items-center gap-2 text-sm text-muted-foreground rounded-full p-2 hover:bg-accent/30"
               >
-                <Sheet className="text-foreground rounded-full h-8 w-8" />
+                <motion.span whileHover={{ rotate: 3 }} className="inline-flex">
+                  <Sheet className="text-foreground rounded-full h-8 w-8" />
+                </motion.span>
                 <div className="flex flex-col">
-                  <h4 className="font-semibold">{activity.title}</h4>
+                  <h4 className="font-semibold text-foreground">{activity.title}</h4>
                   <p className="text-xs text-muted-foreground italic">
                     Edited {activity.editedTime}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>{" "}
         </div>

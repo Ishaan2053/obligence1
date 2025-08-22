@@ -23,6 +23,7 @@ import {
   DumbbellIcon,
   Cog,
   ShredderIcon,
+  HelpCircleIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -80,14 +81,14 @@ export function AppSidebar() {
           </SidebarMenuItem>{" "}
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip="Create & Run Load Tests"
-              isActive={pathname.includes("/dashboard/load")}
+              tooltip="Pre Assessment Clarifications"
+              isActive={pathname.includes("/dashboard/clarifications")}
               asChild
               className="flex items-center"
             >
               <Link href="/dashboard/load">
-                <DumbbellIcon className="h-4 w-4" />
-                <span>Load Test APIs</span>
+                <HelpCircleIcon className="h-4 w-4" />
+                <span>Pre Assessment Clarifications</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
