@@ -103,7 +103,7 @@ function page({}: Props) {
       <Separator className="my-6" />
 
       <motion.section
-        className="flex flex-col md:flex"
+        className="flex md:flex"
         initial={{ opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -24 }}
@@ -127,7 +127,7 @@ function page({}: Props) {
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.99 }}
                 transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.6 }}
-                className="flex items-center gap-2 text-sm text-muted-foreground rounded-full p-2 hover:bg-accent/30"
+                className="cursor-pointer flex items-center gap-2 text-sm text-muted-foreground w-fit rounded-full px-4 py-2 hover:bg-accent/30"
               >
                 <motion.span whileHover={{ rotate: 3 }} className="inline-flex">
                   <Sheet className="text-foreground rounded-full h-8 w-8" />
@@ -143,7 +143,8 @@ function page({}: Props) {
           </div>{" "}
         </div>
 
-        <div className="w-1/2"></div>
+        <div className="w-1/2">
+         <h2 className="font-semibold text-2xl">Starred Reports</h2></div>
   </motion.section>
     </div>
   );
