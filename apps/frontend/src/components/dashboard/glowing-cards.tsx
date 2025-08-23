@@ -3,9 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface GlowingCardProps {
-  children: React.ReactNode;
-  className?: string;
+export interface GlowingCardProps extends React.HTMLAttributes<HTMLDivElement> {
   glowColor?: string;
   hoverEffect?: boolean;
 }
@@ -89,6 +87,12 @@ export const GlowingCards: React.FC<GlowingCardsProps> = ({
   const overlayRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [showOverlay, setShowOverlay] = useState(false);
+
+  // Type guard to ensure child is a GlowingCard ReactElement so props are typed
+  const isGlowingCardElement = (
+    node: React.ReactNode
+  ): node is React.ReactElement<GlowingCardProps> =>
+    React.isValidElement(node) && node.type === GlowingCard;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -181,10 +185,10 @@ export const GlowingCards: React.FC<GlowingCardsProps> = ({
               )}
               style={{ padding: "var(--padding)" }} // String literal
             >
-              {React.Children.map(children, (child, index) => {
-                if (React.isValidElement(child) && child.type === GlowingCard) {
-                  const cardGlowColor = child.props.glowColor || "#3b82f6";
-                  return React.cloneElement(child as React.ReactElement<any>, {
+              {React.Children.map(children, (child) => {
+                if (isGlowingCardElement(child)) {
+                  const cardGlowColor = child.props.glowColor ?? "#3b82f6";
+                  return React.cloneElement(child, {
                     className: cn(
                       child.props.className,
                       "bg-opacity-15 dark:bg-opacity-15",
