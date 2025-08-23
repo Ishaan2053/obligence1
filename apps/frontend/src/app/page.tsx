@@ -177,22 +177,32 @@ export default function Home() {
     <div className="font-sans ">
       <Navbar />
       <div className="space-y-20">
-        <Hero />
-        <Features />
-        <Timeline data={data} />
+        <section id="hero">
+          <Hero />
+        </section>
+        <section id="features">
+          <Features />
+        </section>
+        <section id="solutions">
+          <Timeline data={data} />
+        </section>
         <TextScroll
           className="font-display text-center text-4xl font-semibold tracking-tighter md:text-7xl md:leading-[5rem]"
           text="Obligence is great"
           default_velocity={2}
         />
-        <CardCarousel
-          images={images}
-          autoplayDelay={2000}
-          showPagination={true}
-          showNavigation={true}
-        />
+        <section id="testimonials">
+          <CardCarousel
+            images={images}
+            autoplayDelay={2000}
+            showPagination={true}
+            showNavigation={true}
+          />
+        </section>
         {/* <Pricing /> */}
-        <CTA />
+        <section id="pricing">
+          <CTA />
+        </section>
         <Footer />
       </div>
       <SmokeyCursor

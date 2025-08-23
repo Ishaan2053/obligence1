@@ -13,8 +13,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: "Features", href: "/features" },
-  { name: "Solutions", href: "/solutions" },
+  { name: "Features", href: "#features" },
+  { name: "Solutions", href: "#solutions" },
   { name: "Testimonials", href: "#testimonials" },
   { name: "Pricing", href: "#pricing" }
 ];
@@ -131,6 +131,16 @@ export default function Navbar() {
                     prefetch={false}
                     href={item.href}
                     className="text-foreground/80 hover:text-foreground relative rounded-lg px-4 py-2 text-sm font-light transition-colors duration-200"
+                    onClick={(e) => {
+                      if (item.href.startsWith('#')) {
+                        e.preventDefault();
+                        const el = document.querySelector(item.href);
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          setIsMobileMenuOpen(false);
+                        }
+                      }
+                    }}
                   >
                     {hoveredItem === item.name && (
                       <motion.div
@@ -220,7 +230,18 @@ export default function Navbar() {
                         prefetch={false}
                         href={item.href}
                         className="text-foreground hover:bg-muted block rounded-lg px-4 py-3 font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={(e) => {
+                          if (item.href.startsWith('#')) {
+                            e.preventDefault();
+                            const el = document.querySelector(item.href);
+                            if (el) {
+                              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              setIsMobileMenuOpen(false);
+                            }
+                          } else {
+                            setIsMobileMenuOpen(false);
+                          }
+                        }}
                       >
                         {item.name}
                       </Link>
