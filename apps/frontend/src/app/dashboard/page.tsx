@@ -3,7 +3,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { Separator } from "@/components/ui/separator";
-import { Sheet } from "lucide-react";
+import { FilePlus, Sheet } from "lucide-react";
+import GlowingCards, { GlowingCard } from "@/components/dashboard/glowing-cards";
 type Props = {};
 
 function page({}: Props) {
@@ -20,7 +21,7 @@ function page({}: Props) {
         <h1 className="font-light text-sm text-muted-foreground">
           My Workspace
         </h1>
-        <h2 className="font-semibold text-2xl">Welcome, {user?.name}!</h2>
+        <h2 className="font-semibold text-2xl">Welcome, <span className="from-primary/10 via-foreground/85 to-foreground/50 bg-gradient-to-tl bg-clip-text text-balance text-transparent ">{user?.name}!</span></h2>
       </motion.section>
 
       <motion.section
@@ -29,56 +30,48 @@ function page({}: Props) {
         exit={{ opacity: 0, x: -24 }}
         transition={{ duration: 0.22, ease: "easeOut", delay: 0.05 }}
       >
-        {/* cards */}
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-4">
+        {/* cards with glowing effect */}
+        <GlowingCards
+          enableGlow
+          glowRadius={30}
+          glowOpacity={1}
+          animationDuration={350}
+          // enableHover
+          gap="1rem"
+          maxWidth="64rem"
+          padding="0"
+          borderRadius="1rem"
+          className="mt-2"
+       >
           {[
-            {
-              title: "Document 1",
-              imageUrl: "/test.jpg",
-              link: "/document1",
-            },
-            {
-              title: "Document 2",
-              imageUrl: "/test.jpg",
-              link: "/document2",
-            },
-            {
-              title: "Document 3",
-              imageUrl: "/test.jpg",
-              link: "/document3",
-            },
-            {
-              title: "Document 4",
-              imageUrl: "/test.jpg",
-              link: "/document4",
-            },
-            {
-              title: "Document 5",
-              imageUrl: "/test.jpg",
-              link: "/document5",
-            },
-          ].map((document, i) => (
-            <motion.a
-              key={i}
-              href={document.link}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
-              className="flex flex-col items-center rounded-2xl outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring"
-            >
-              <div className="border rounded-2xl size-20 md:h-40 md:w-40 overflow-hidden bg-card">
-                <motion.img
-                  src={document.imageUrl}
-                  alt={document.title}
-                  className="size-full object-cover"
-                  whileHover={{ scale: 1.03 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                />
-              </div>
-              <h3 className="mt-2 text xs md:text-base text-center font-semibold">{document.title}</h3>
-            </motion.a>
-          ))}
-        </div>
+            { title: "New Document", link: "/document1", icon: FilePlus, glowColor: "#737373" },
+            { title: "Document 2", link: "/document2", icon: Sheet, glowColor: "#f97316" },
+            { title: "Document 3", link: "/document3", icon: Sheet, glowColor: "#737373" },
+     
+          ].map((document, i) => {
+            const Icon = (document.icon ?? Sheet) as React.ElementType;
+            return (
+              <GlowingCard
+                key={i}
+                glowColor={document.glowColor as string}
+                className="group cursor-pointer select-none flex items-center justify-center min-h-32 md:min-h-48"
+              >
+                <motion.a
+                  href={document.link}
+                  whileHover={{ y: -4 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
+                  className="flex flex-col items-center outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring"
+                >
+                  <motion.span>
+                    <Icon className=" group-hover:rotate-6 transition-all text-foreground h-10 w-10 md:h-20 md:w-20" />
+                  </motion.span>
+                  <h3 className="mt-2 text-xs text-foreground md:text-base text-center font-semibold">{document.title}</h3>
+                </motion.a>
+              </GlowingCard>
+            );
+          })}
+        </GlowingCards>
       </motion.section>
       <Separator className="my-6" />
 
@@ -105,14 +98,7 @@ function page({}: Props) {
                 title: "Document 3",
                 editedTime: "1 day ago",
               },
-              {
-                title: "Document 4",
-                editedTime: "3 days ago",
-              },
-              {
-                title: "Document 5",
-                editedTime: "1 week ago",
-              },
+             
             ].map((activity, i) => (
               <motion.div
                 key={i}

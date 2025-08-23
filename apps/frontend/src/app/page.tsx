@@ -1,5 +1,4 @@
 import Hero from "@/components/hero";
-import Pricing from "@/components/pricing";
 import { CardCarousel } from "@/components/ui/card-carousel";
 import CTA from "@/components/ui/cta";
 import Footer from "@/components/ui/footer";
