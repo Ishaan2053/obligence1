@@ -5,11 +5,38 @@ import { useSession } from "next-auth/react";
 import { Separator } from "@/components/ui/separator";
 import { FilePlus, Sheet } from "lucide-react";
 import GlowingCards, { GlowingCard } from "@/components/dashboard/glowing-cards";
+import useSWR from "swr";
 type Props = {};
 
 function page({}: Props) {
   const { data: session } = useSession();
   const user = session?.user;
+
+  type RecentDoc = { id: string; title: string; editedAt: string };
+  const fetcher = (url: string) => fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`Failed ${r.status}`);
+    return r.json();
+  });
+  const { data, error, isLoading } = useSWR<{ documents: RecentDoc[] }>(
+    "/api/recent-documents",
+    fetcher
+  );
+  const recent = data?.documents ?? [];
+
+  const formatRelative = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      const diff = Date.now() - d.getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 60) return `${mins} min${mins === 1 ? "" : "s"} ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `${hrs} hour${hrs === 1 ? "" : "s"} ago`;
+      const days = Math.floor(hrs / 24);
+      return `${days} day${days === 1 ? "" : "s"} ago`;
+    } catch {
+      return new Date(iso).toLocaleString();
+    }
+  };
   return (
     <div className="max-w-5xl mx-auto space-y-6 justify-center">
       <motion.section
@@ -85,23 +112,18 @@ function page({}: Props) {
         <div className="w-full md:w-1/2 space-y-6">
           <h2 className="font-semibold text-2xl">Recent Activity</h2>
           <div className="space-y-4">
-            {[
-              {
-                title: "Document 1",
-                editedTime: "2 hours ago",
-              },
-              {
-                title: "Document 2",
-                editedTime: "5 hours ago",
-              },
-              {
-                title: "Document 3",
-                editedTime: "1 day ago",
-              },
-             
-            ].map((activity, i) => (
+            {isLoading && (
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            )}
+            {error && (
+              <p className="text-sm text-destructive">Failed to load recent documents.</p>
+            )}
+            {!isLoading && !error && recent.length === 0 && (
+              <p className="text-sm text-muted-foreground">No recent documents.</p>
+            )}
+            {recent.map((doc) => (
               <motion.div
-                key={i}
+                key={doc.id}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.99 }}
                 transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.6 }}
@@ -111,9 +133,9 @@ function page({}: Props) {
                   <Sheet className="text-foreground rounded-full h-8 w-8" />
                 </motion.span>
                 <div className="flex flex-col">
-                  <h4 className="font-semibold text-foreground">{activity.title}</h4>
+                  <h4 className="font-semibold text-foreground">{doc.title}</h4>
                   <p className="text-xs text-muted-foreground italic">
-                    Edited {activity.editedTime}
+                    Edited {formatRelative(doc.editedAt)}
                   </p>
                 </div>
               </motion.div>
