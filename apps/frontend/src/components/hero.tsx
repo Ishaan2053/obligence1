@@ -99,15 +99,15 @@ return (
         }}
         className="relative mx-auto mt-16 max-w-4xl"
         >
-        <div className="border-border/40 bg-background/50 overflow-hidden rounded-xl border shadow-xl backdrop-blur-sm">
+        <div className="border-border/40 bg-background/50 overflow-hidden rounded-2xl border shadow-xl backdrop-blur-sm">
             <div className="border-border/40 bg-muted/50 flex h-10 items-center border-b px-4">
             <div className="flex space-x-2">
                 <div className="h-3 w-3 rounded-full bg-red-500"></div>
                 <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
                 <div className="h-3 w-3 rounded-full bg-green-500"></div>
             </div>
-            <div className="bg-background/50 text-muted-foreground mx-auto flex items-center rounded-md px-3 py-1 text-xs">
-                https://your-awesome-app.com
+            <div className="bg-background/50 text-muted-foreground mx-auto flex items-center rounded-full px-3 py-1 text-xs">
+                Business Agreement Assessment Report
             </div>
             </div>
             <div className="relative">
@@ -120,14 +120,7 @@ return (
             </div>
         </div>
 
-        {/* Floating elements for visual interest */}
-        <div className="border-border/40 bg-background/80 absolute -top-6 -right-6 h-12 w-12 rounded-lg border p-3 shadow-lg backdrop-blur-md">
-            <div className="bg-primary/20 h-full w-full rounded-md"></div>
-        </div>
-        <div className="border-border/40 bg-background/80 absolute -bottom-4 -left-4 h-8 w-8 rounded-full border shadow-lg backdrop-blur-md"></div>
-        <div className="border-border/40 bg-background/80 absolute right-12 -bottom-6 h-10 w-10 rounded-lg border p-2 shadow-lg backdrop-blur-md">
-            <div className="h-full w-full rounded-md bg-green-500/20"></div>
-        </div>
+       
         </motion.div>
     </div>
     </div>

@@ -65,7 +65,7 @@ export default function Home() {
       title: "Step 1: Upload Your Document",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-lg tracking-wide font-normal ">
             Drag and drop your contract or agreement as a PDF. Obligence accepts
             a variety of legal and business documents for instant processing.
           </p>
@@ -92,7 +92,7 @@ export default function Home() {
       title: "Step 2: AI Analyzes Your Contract",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-lg tracking-wide font-normal ">
             Our intelligent agent powered by Portia deeply scans the document,
             extracting key clauses, important dates, parties, and
             obligations—all in minutes.
@@ -120,9 +120,9 @@ export default function Home() {
       title: "Step 3: Human Review (If Needed)",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
+          <p className="mb-8 text-lg tracking-wide font-normal ">
             If something in your contract is ambiguous or complex, Obligence
-            automatically pauses and invites you or your legal team to review
+            automatically pauses and invites you to review
             flagged sections.
           </p>
           <div className="grid grid-cols-2 gap-4">
@@ -148,8 +148,8 @@ export default function Home() {
       title: "Step 4: Receive Structured Insights",
       content: (
         <div>
-          <p className="mb-8 text-xs font-normal text-neutral-800 md:text-sm dark:text-neutral-200">
-            Download, share, or explore your contract’s extracted data—fully
+          <p className="mb-8 text-lg tracking-wide font-normal ">
+            Download, or explore your contract’s extracted data—fully
             structured, searchable, and ready for business action or legal
             compliance.
           </p>
