@@ -102,7 +102,7 @@ export default function SettingsDialog() {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant="outline" size="sm">
+				<Button variant="outline" size="sm" className="w-full font-light border-0 ring-0 outline-0 justify-start bg-transparent">
 					<Settings className="mr-2 h-4 w-4" />
 					Open Settings
 				</Button>

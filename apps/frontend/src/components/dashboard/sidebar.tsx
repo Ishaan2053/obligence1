@@ -29,14 +29,28 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import SettingsDialog from "./settings";
-import Header from "./profileCard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function AppSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const user = (session?.user || {}) as {
+    image?: string | null;
+    name?: string | null;
+    email?: string | null;
+  };
 
   return (
     <Sidebar collapsible="icon" className="">
@@ -113,9 +127,67 @@ export function AppSidebar() {
               <span>Collapse Sidebar</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-
+          {/* Account menu button with avatar and dropdown */}
           <SidebarMenuItem>
-            <Header />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  variant="outline"
+                  size="lg"
+                  className="items-center"
+                  tooltip={`Your Account`}
+                >
+                  <Avatar className="h-6 w-6 ml-1">
+                    <AvatarImage src={user?.image ?? undefined} alt={user?.name || ""} />
+                    <AvatarFallback>
+                      {/* Use first letter of name or a fallback icon */}
+                      {(user?.name?.charAt(0) || "U").toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex min-w-0 flex-col text-left">
+                    <span className="truncate">{user?.name || "Account"}</span>
+                    {user?.email && (
+                      <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                    )}
+                  </div>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full p-0 rounded-2xl" align="end">
+                <DropdownMenuLabel className="flex gap-2 items-center">
+                  <div>
+                  <Avatar className="h-6 w-6 ml-1">
+                    <AvatarImage src={user?.image ?? undefined} alt={user?.name || ""} />
+                    <AvatarFallback>
+                      {/* Use first letter of name or a fallback icon */}
+                      {(user?.name?.charAt(0) || "U").toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  </div>
+                  <div className="flex min-w-0 flex-col text-left">
+                    <span className="truncate">{user?.name || "Account"}</span>
+                    {user?.email && (
+                      <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                    )}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator/>
+                <DropdownMenuItem asChild>
+                  <SettingsDialog />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="px-2"
+                  asChild
+                  onClick={() => {
+                    signOut({ redirect: true, redirectTo: "/login" });
+                  }}
+                >
+                  <button className="w-full pl-3 font-light text-left hover:text-red-500 transition flex items-center">
+                    <LogOut className="mr-1" />
+                    Logout
+                  </button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
