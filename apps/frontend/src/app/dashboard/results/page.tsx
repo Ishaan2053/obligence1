@@ -150,7 +150,7 @@ function ReportView({ data }: { data: ContractReport }) {
             </Badge>
           ) : (
             <Badge variant="secondary" className="rounded-full">
-              <CheckCircle2 className="mr-1" /> No risk flags
+              <CheckCircle2 className="mr-1 text-green-500" /> No risk flags
             </Badge>
           )}
           <div className="h-6 w-px bg-border mx-2 hidden md:block" />
@@ -228,7 +228,7 @@ function ReportView({ data }: { data: ContractReport }) {
           <CardFooter className="border-t justify-between">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <Badge variant="secondary" className="rounded-full">
-                <DollarSign className="mr-1" /> Payments due quarterly
+                <DollarSign className="mr-1 text-green-500" /> Payments due quarterly
               </Badge>
               <Badge variant="outline" className="rounded-full">
                 <Calendar className="mr-1" /> Key dates prioritized

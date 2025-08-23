@@ -1,3 +1,4 @@
+import Features from "@/components/landing/features";
 import Hero from "@/components/landing/hero";
 import { CardCarousel } from "@/components/ui/card-carousel";
 import CTA from "@/components/ui/cta";
@@ -121,8 +122,7 @@ export default function Home() {
         <div>
           <p className="mb-8 text-lg tracking-wide font-normal ">
             If something in your contract is ambiguous or complex, Obligence
-            automatically pauses and invites you to review
-            flagged sections.
+            automatically pauses and invites you to review flagged sections.
           </p>
           <div className="grid grid-cols-2 gap-4">
             <img
@@ -178,7 +178,7 @@ export default function Home() {
       <Navbar />
       <div className="space-y-20">
         <Hero />
-
+        <Features />
         <Timeline data={data} />
         <TextScroll
           className="font-display text-center text-4xl font-semibold tracking-tighter md:text-7xl md:leading-[5rem]"
@@ -196,14 +196,14 @@ export default function Home() {
         <Footer />
       </div>
       <SmokeyCursor
-  splatRadius={0.1}
-  splatForce={3000}
-  densityDissipation={8}
-  velocityDissipation={5}
-  colorUpdateSpeed={20}
-  simulationResolution={64}
-   backgroundColor={{ r: 0.8, g: 0.1, b: 0 }}
-/>
+        splatRadius={0.1}
+        splatForce={3000}
+        densityDissipation={8}
+        velocityDissipation={5}
+        colorUpdateSpeed={20}
+        simulationResolution={64}
+        backgroundColor={{ r: 0.8, g: 0.1, b: 0 }}
+      />
     </div>
   );
 }
