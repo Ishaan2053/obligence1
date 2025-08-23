@@ -4,5 +4,8 @@
   "version": "1.0.0",
   "workspaces": [
     "apps/*"
-  ]
+  ],
+  "devDependencies": {
+    "@types/culori": "^4.0.0"
+  }
 }

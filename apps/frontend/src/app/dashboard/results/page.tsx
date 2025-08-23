@@ -108,25 +108,99 @@ function ReportView({ data }: { data: ContractReport }) {
     URL.revokeObjectURL(url)
   }
 
-  function handleExportPDF() {
-    const html = printRef.current?.innerHTML
-    const w = window.open("", "_blank", "noopener,noreferrer")
-    if (!w || !html) return
-    w.document.write(`<!doctype html><html><head><title>Contract Report</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>
-        :root{color-scheme:light dark;font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif}
-        body{margin:24px}
-        h1,h2{margin:0 0 8px 0}
-        .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-        .card{border:1px solid #e5e7eb;border-radius:16px;padding:16px}
-        .muted{color:#6b7280}
-        ul{margin:8px 0 0 16px}
-      </style>
-    </head><body>${html}</body></html>`)
-    w.document.close()
-    w.focus()
-    w.print()
+  async function handleExportPDF() {
+    const root = printRef.current
+    if (!root) return
+
+    // Use html-to-image to rasterize the DOM preserving CSS (including OKLCH) into PNGs
+    const { toPng } = await import('html-to-image')
+    const { PDFDocument, rgb } = await import('pdf-lib')
+    const { parse, converter, formatRgb } = await import('culori')
+
+    // Clone the root and measure to ensure correct sizing
+    const width = root.scrollWidth
+    const height = root.scrollHeight
+
+    // Render at higher pixel ratio for sharpness
+    const pixelRatio = Math.min(window.devicePixelRatio || 2, 3)
+
+    // Resolve app background color from CSS variable --background (globals.css)
+    const rootStyle = getComputedStyle(document.documentElement)
+    const bgVar = (rootStyle.getPropertyValue('--background') || '').trim()
+    const toRgb = converter('rgb')
+    const parsed = bgVar ? parse(bgVar) : null
+    const rgbObj = parsed ? toRgb(parsed) : null as any
+    const bgCss = rgbObj ? formatRgb(rgbObj) : getComputedStyle(document.body).backgroundColor || '#ffffff'
+
+    // Convert the whole content to a PNG image
+    const dataUrl = await toPng(root, {
+      cacheBust: true,
+      pixelRatio,
+      skipFonts: false,
+      backgroundColor: bgCss,
+      style: {
+        // Ensure no sticky/fixed overlaps impact capture
+        transform: 'none',
+        opacity: '1',
+      },
+    })
+
+    // Create PDF and embed image
+    const pdf = await PDFDocument.create()
+    // Use A4 portrait by default scaled to content
+  const A4_WIDTH = 595.28 // pt
+  const A4_HEIGHT = 841.89 // pt
+  const marginX = 36 // 0.5in horizontal padding
+  const marginY = 36 // 0.5in vertical padding
+
+    // Load image
+    const pngBytes = await fetch(dataUrl).then(r => r.arrayBuffer())
+    const png = await pdf.embedPng(pngBytes)
+
+    // Compute scaling across multiple pages if content is taller than A4
+    const imgWidth = png.width
+    const imgHeight = png.height
+    const pageWidth = A4_WIDTH
+    const pageHeight = A4_HEIGHT
+    const contentWidth = pageWidth - marginX * 2
+    const contentHeight = pageHeight - marginY * 2
+    const scale = contentWidth / imgWidth
+    const scaledImgWidth = imgWidth * scale
+    const scaledImgHeight = imgHeight * scale
+
+    // Number of pages required (based on content area height)
+    const pagesNeeded = Math.max(1, Math.ceil(scaledImgHeight / contentHeight))
+
+    for (let i = 0; i < pagesNeeded; i++) {
+      const page = pdf.addPage([pageWidth, pageHeight])
+      // Paint page background to match app background
+      if (rgbObj && typeof rgbObj.r === 'number') {
+        page.drawRectangle({ x: 0, y: 0, width: pageWidth, height: pageHeight, color: rgb(rgbObj.r, rgbObj.g, rgbObj.b) })
+      }
+
+      const yOffset = contentHeight * i
+      // Draw a clipped portion per page by shifting the image upward
+      page.drawImage(png, {
+        x: marginX,
+        y: marginY + (contentHeight - scaledImgHeight) - yOffset,
+        width: scaledImgWidth,
+        height: scaledImgHeight,
+      })
+    }
+
+  const pdfBytes = await pdf.save()
+  // Create a concrete ArrayBuffer (avoids ArrayBufferLike/SharedArrayBuffer union issues)
+  const copy = new Uint8Array(pdfBytes.length)
+  copy.set(pdfBytes)
+  const blob = new Blob([copy.buffer], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `contract-${data.contract_id}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
   }
 
   const renewalRule = useMemo(() => {
