@@ -1,201 +1,122 @@
-# Technical File Responsibilities & Architecture — Portia Legal Extractor
-
-This document lists each key file in the monorepo (no code, just purpose), explains integration choices (**webhooks + polling**), persistence of clarifications, API endpoint specs with input/output JSON, and UX design for **summarized, understandable extraction results**.
-
----
-
-## Monorepo file responsibilities
-
-### Root
-
-* **README.md** — project overview, setup instructions.
-* **.env.example** — sample environment variables.
-* **infra/** — infra configs (docker, deployment).
-
-  * `docker-compose.yml` — orchestrates backend, frontend, MongoDB, Redis, MinIO, Weaviate.
-  * `Dockerfile.backend` — backend container definition.
-  * `Dockerfile.frontend` — frontend container definition.
-
-### Backend (`apps/backend`)
-
-* **app/main.py** — FastAPI entrypoint, routes, middlewares, auth.
-* **app/agent.py** — initializes Portia agent, defines extraction plan logic.
-* **app/tools/pdf\_tool.py** — PDF reader tool for ingestion.
-* **app/tools/clarifications.py** — helper to manage clarifications (serialize, resolve plan runs).
-* **app/db.py** — MongoDB connection setup, collections.
-* **app/models.py** — schema definitions (Pydantic models for MongoDB documents).
-* **app/schemas.py** — request/response validation for API endpoints.
-* **app/worker.py** — worker process (background tasks for running Portia agent, monitoring runs).
-* **app/config.py** — environment variable management.
-* **requirements.txt** — Python dependencies.
-
-### Frontend (`apps/frontend`)
-
-* **app/page.tsx** — dashboard/home.
-* **app/upload.tsx** — contract upload UI.
-* **app/review/\[clarificationId].tsx** — legal team review form.
-* **app/components/** — shared React components (file uploader, status cards, PDF viewer, clarification form).
-* **package.json** — dependencies.
-
-### Infra
-
-* **infra/docker-compose.yml** — local dev services (backend, frontend, mongodb, redis, weaviate, minio).
-* \*\*infra/\*\*Dockerfiles — build backend/frontend containers.
-
-### CI/CD
-
-* **.github/workflows/backend-deploy.yml** — CI pipeline for backend.
-* **.github/workflows/frontend-deploy.yml** — CI pipeline for frontend.
+# Obligence: AI-Powered Contract Intelligence Platform
+![Obligence](/apps/frontend/public/landing.png)
+> Seamlessly extract, analyze, and gain insights from contracts using Portia AI.  
+> **Monorepo: Next.js 15.5 (Frontend) & FastAPI + Portia SDK (Backend)**  
+>  
+> _Built during AgentHack 2025!_
 
 ---
 
-## Clarifications flow with Webhooks + Polling
+## 🚀 Features
 
-1. **Clarification raised:**
-
-   * Worker detects `Clarification` in Portia run.
-   * Persist in MongoDB `clarifications` collection.
-   * Trigger **email notification** and optional **Slack webhook**.
-
-2. **Frontend polling:**
-
-   * Next.js polls `/api/contracts/{id}/clarifications`.
-   * Always returns unresolved clarifications from DB.
-   * If tab was closed, user sees them when they log back in.
-
-3. **Clarification resolved:**
-
-   * User submits resolution via `/api/clarifications/{id}/resolve`.
-   * Backend updates DB and resumes Portia run.
-
-4. **Extraction complete:**
-
-   * Persist structured result in MongoDB `extractions` collection.
-   * Send notification to Slack/email.
+- **Automated Legal Document Extraction:**  
+  Upload PDF contracts and agreements; extract parties, obligations, dates, and critical clauses in seconds.
+- **Hybrid AI + Human-in-the-Loop Review:**  
+  Portia agent flags ambiguities and routes them to you — ensuring high-confidence results.
+- **Real-Time Risk Analysis:**  
+  Instantly identifies missing or risky clauses so you can act before it’s too late.
+- **Interactive Insights Dashboard:**  
+  Visualize, export, and search structured contract data, deadlines, and risk metrics.
+- **Seamless Collaboration:**  
+  Multi-user access, notifications, and rapid feedback cycles for audit-ready workflows.
 
 ---
 
-## API endpoint specifications
+## 🧠 Technical Process Overview
 
-### 1. Upload Contract
+### 1. Contract Upload & Ingestion
 
-**POST** `/api/contracts/upload`
+*Users upload a PDF through the Next.js frontend.*  
+- React dropzone for upload
+- Immediate feedback on format, size, duplicates
 
-* **Input (multipart/form-data):**
+### 2. AI Extraction (Backend/Portia SDK)
 
-  ```json
-  { "file": <PDF file>, "metadata": {"title": "Contract ABC"} }
-  ```
-* **Response:**
+*FastAPI backend manages async document processing:*
+- Saves incoming file & metadata
+- Kicks off Portia agent with `PDFReader` and legal extraction plan
+- Portia parses text, runs custom clause prompts, structures results:
+    - **Extracted:** `parties`, `dates`, `obligations`, `clauses`, risk triggers
+- **If ambiguity:**  
+  - Portia’s planners flag for human input, pausing flow until legal review/response is given (stored to DB, resumes on resolve)
+- Stores final structured data + trace for full auditability
 
-  ```json
-  { "contract_id": "64c0f9...", "status": "processing" }
-  ```
+### 3. Results Presentation & Dashboard (Frontend)
 
-### 2. List Clarifications for a Contract
-
-**GET** `/api/contracts/{contract_id}/clarifications`
-
-* **Response:**
-
-  ```json
-  [
-    {
-      "id": "clar123",
-      "question": "Which effective date should we use?",
-      "options": ["2024-01-01", "2024-02-01"],
-      "status": "pending",
-      "created_at": "2025-08-20T10:00:00Z"
-    }
-  ]
-  ```
-
-### 3. Resolve Clarification
-
-**POST** `/api/clarifications/{clarification_id}/resolve`
-
-* **Input:**
-
-  ```json
-  { "answer": "2024-01-01" }
-  ```
-* **Response:**
-
-  ```json
-  { "id": "clar123", "status": "resolved", "resolved_at": "2025-08-21T12:00:00Z" }
-  ```
-
-### 4. Get Extraction Result
-
-**GET** `/api/contracts/{contract_id}/extraction`
-
-* **Response:**
-
-  ```json
-  {
-    "contract_id": "64c0f9...",
-    "status": "completed",
-    "summary": "This contract is between ABC Corp and XYZ Ltd, effective 2024-01-01, renewable annually.",
-    "parties": ["ABC Corp", "XYZ Ltd"],
-    "dates": {"effective_date": "2024-01-01", "termination_date": "2025-01-01"},
-    "obligations": [
-      {"party": "ABC Corp", "text": "Deliver monthly software updates"},
-      {"party": "XYZ Ltd", "text": "Provide payment of $50,000 quarterly"}
-    ],
-    "clarifications": [ {"id": "clar123", "status": "resolved"} ]
-  }
-  ```
+- Fetches extraction summaries and traces via REST API
+- Dynamic table and PDF viewer with highlight overlays
+- Real-time updates via long-poll for background jobs
+- User can review, submit clarifications and download data as PDF or JSON
 
 ---
 
-## User experience after extraction
+## 🖼️ Architecture & Demo
+![Architecture Flowchart](/apps/frontend/public/Flowchart.png)
 
-Instead of showing a raw JSON or lengthy contract text, the frontend should provide:
+## 🌟 User Flow
 
-1. **Readable Summary Card:**
-
-   * Key parties
-   * Effective and termination dates
-   * Overall obligations summary (short sentences)
-   * Renewal/termination rules
-
-2. **Highlights with drill-down:**
-
-   * Obligations in bullet points grouped by party.
-   * Important clauses (dates, payments, renewal) surfaced first.
-
-3. **Visual indicators:**
-
-   * Status chips (e.g., *Active until Jan 2025*, *Pending Renewal*).
-   * Risk flags (if agent marks ambiguous clauses).
-
-4. **Download/export options:**
-
-   * Export summary as PDF.
-   * Download full structured JSON for system integration.
-
-This way, the user interacts with a concise, clear overview instead of parsing the entire contract text.
+1. **Sign Up / Log In**  
+   Fast, secure onboarding with multiple account linking  .
+2. **Document Upload**  
+   Drag-and-drop or browse, status bar feedback.
+3. **Background Extraction**  
+   Automatic queueing; jobs start instantly.
+4. **Review Results**  
+   Explore extracted data; flagged sections if review needed.
+5. **Action & Collaboration**  
+   Mark issues resolved, or comment for later review.
+6. **Export & Analyze**  
+   Download structured data or view reports in dashboard.
 
 ---
 
-## Slack and Email Notifications
+## 🛠️ Installation & Local Development
 
-* **Slack:** post messages on clarification raised/resolved and extraction complete.
-* **Email:** transactional notifications with summary + action links.
+### Prerequisites
+
+- Node.js (v18+)
+- Python 3.10+
+- Docker Compose (for databases/cache)
+- Portia API SDK key (sign up at [Portia Labs](https://portialabs.ai))
+
+### 1. Clone the Monorepo
+```git clone https://github.com/yourusername/obligence.git
+cd obligence```
+
+### 2. Set Up Infrastructure
+```docker-compose up -d```
+
+### 3. Backend (FastAPI + Portia)
+```
+cd packages/backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env # Fill PORTIA & DB keys
+alembic upgrade head # Migrate DB
+uvicorn app.main:app --reload
+```
+
+### 4. Frontend (Next.js)
+```
+cd packages/frontend
+pnpm install
+cp .env.local.example .env.local # Set NEXT_PUBLIC_API_URL
+pnpm dev
+
+```
+- Access the frontend at [localhost:3000](http://localhost:3000)
+- API is served at [localhost:8000](http://localhost:8000)
 
 ---
 
-## MongoDB + Weaviate integration
+## 📦 Repo Structure
 
-* **MongoDB** stores contracts, clarifications, extractions.
-* **Weaviate** stores clause embeddings for semantic search.
-* After extraction, backend populates both.
+obligence/
+├── apps/
+│ ├── backend/ # FastAPI + Portia SDK agent logic & API
+│ └── frontend/ # Next.js 14, React, all UI/UX assets
+├── infrastructure/ # Docker, scripts, infra-as-code
+└── README.md
 
----
-
-## Summary
-
-* File responsibilities defined.
-* Clarification flow uses webhooks (Slack/email) + polling (Next.js).
-* API endpoints with input/output JSON defined.
-* After extraction, user sees **summarized results** with clear highlights, not raw contracts.
+Made by Ishaan and Pranav Tripathi during AgentHack 2025
