@@ -1,57 +1,59 @@
 import Hero from "@/components/hero";
+import Pricing from "@/components/pricing";
 import { CardCarousel } from "@/components/ui/card-carousel";
 import CTA from "@/components/ui/cta";
 import Footer from "@/components/ui/footer";
 import Navbar from "@/components/ui/navbar";
+import SmokeyCursor from "@/components/ui/smokey-cursor";
 import { TextScroll } from "@/components/ui/text-scroll";
 import { Timeline } from "@/components/ui/timeline";
 
 export default function Home() {
   const images = [
     {
-      src: "",
-      alt: "Image 1",
+      src: "/test.jpg",
+      alt: "/test.jpg",
       testimonial:
         "Obligence has drastically reduced our contract review time. The AI spots the details I care about before I even have to ask.",
     },
     {
-      src: "/card/1.png",
+      src: "/test.jpg",
       alt: "Image 1",
       testimonial:
         "As a non-lawyer, extracting obligations and deadlines from complex agreements used to take hours. Now, it’s minutes with Obligence.",
     },
     {
-      src: "/card/1.png",
+      src: "/test.jpg",
       alt: "Image 1",
       testimonial:
         "Our department manages hundreds of contracts a year. Obligence takes the guesswork out and brings peace of mind.",
     },
     {
-      src: "/card/1.png",
+      src: "/test.jpg",
       alt: "Image 1",
       testimonial:
         "Lease reviews have always been a bottleneck. Obligence’s clause extraction lets me close deals faster and protect our firm’s interests.",
     },
     {
-      src: "/card/1.png",
+      src: "/test.jpg",
       alt: "Image 1",
       testimonial:
         "It used to be daunting to review third-party agreements, but Obligence spotlights what matters and gives actionable summaries.",
     },
     {
-      src: "/card/1.png",
+      src: "/test.jpg",
       alt: "Image 1",
       testimonial:
         "From regulatory addenda to liability clauses, Obligence’s output is structured, clear, and always easy to audit.",
     },
     {
-      src: "/card/1.png",
+      src: "/test.jpg",
       alt: "Image 1",
       testimonial:
         "I love how quickly we can onboard new clients—Obligence automatically highlights IP and confidentiality points, saving our team countless hours.",
     },
     {
-      src: "/card/1.png",
+      src: "/test.jpg",
       alt: "Image 1",
       testimonial:
         "Now, I upload vendor and grant contracts and get an instant snapshot of obligations. Obligence helps our public office stay transparent and proactive.",
@@ -175,22 +177,34 @@ export default function Home() {
   return (
     <div className="font-sans ">
       <Navbar />
-      <Hero />
+      <div className="space-y-20">
+        <Hero />
 
-      <Timeline data={data} />
-      <TextScroll
-        className="font-display text-center text-4xl font-semibold tracking-tighter md:text-7xl md:leading-[5rem]"
-        text="Obligence is great"
-        default_velocity={2}
-      />
-      <CardCarousel
-        images={images}
-        autoplayDelay={2000}
-        showPagination={true}
-        showNavigation={true}
-      />
-      <CTA />
-      <Footer />
+        <Timeline data={data} />
+        <TextScroll
+          className="font-display text-center text-4xl font-semibold tracking-tighter md:text-7xl md:leading-[5rem]"
+          text="Obligence is great"
+          default_velocity={2}
+        />
+        <CardCarousel
+          images={images}
+          autoplayDelay={2000}
+          showPagination={true}
+          showNavigation={true}
+        />
+        {/* <Pricing /> */}
+        <CTA />
+        <Footer />
+      </div>
+      <SmokeyCursor
+  splatRadius={0.1}
+  splatForce={3000}
+  densityDissipation={8}
+  velocityDissipation={5}
+  colorUpdateSpeed={20}
+  simulationResolution={64}
+   backgroundColor={{ r: 0.8, g: 0.1, b: 0 }}
+/>
     </div>
   );
 }
