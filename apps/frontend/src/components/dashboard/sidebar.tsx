@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   useSidebar,
   SidebarSeparator,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import {
   BarChart2,
@@ -32,6 +33,7 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import SettingsDialog from "./settings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import useSWR from "swr";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +42,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -51,6 +54,17 @@ export function AppSidebar() {
     name?: string | null;
     email?: string | null;
   };
+
+  type Report = { id: string; name: string };
+  const fetcher = (url: string) => fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`Failed ${r.status}`);
+    return r.json();
+  });
+  const { data: reportsData, isLoading: reportsLoading, error: reportsError } = useSWR<{ reports: Report[] }>(
+    "/api/reports",
+   fetcher
+  );
+  const reports = reportsData?.reports ?? [];
 
   return (
     <Sidebar collapsible="icon" className="">
@@ -106,6 +120,48 @@ export function AppSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          <SidebarGroupLabel>All Reports</SidebarGroupLabel>
+          {reportsLoading && (
+            <>
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <SidebarMenuItem key={`skeleton-${idx}`}>
+                  <SidebarMenuSkeleton showIcon />
+                </SidebarMenuItem>
+              ))}
+            </>
+          )}
+          {!reportsLoading && reportsError && (
+            <SidebarMenuItem>
+              <div className="text-xs text-destructive px-2 py-1 rounded-md">
+                Failed to load reports.
+              </div>
+            </SidebarMenuItem>
+          )}
+          {!reportsLoading && !reportsError && reports.length === 0 && (
+            <SidebarMenuItem>
+              <div className="text-xs text-muted-foreground px-2 py-1 rounded-md">
+                No reports found.
+              </div>
+            </SidebarMenuItem>
+          )}
+          {!reportsLoading && !reportsError && reports.length > 0 && (
+            <>
+              {reports.map((report) => {
+                const href = `/dashboard/results/${report.id}`;
+                const active = pathname.startsWith("/dashboard/results/") && pathname.includes(report.id);
+                return (
+                  <SidebarMenuItem key={report.id}>
+                    <SidebarMenuButton asChild className="flex items-center" isActive={active}>
+                      <Link href={href}>
+                        <NotepadText className="h-4 w-4" />
+                        <span>{report.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </>
+          )}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>

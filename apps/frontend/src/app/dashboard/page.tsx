@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { FilePlus, Sheet } from "lucide-react";
 import GlowingCards, { GlowingCard } from "@/components/dashboard/glowing-cards";
 import useSWR from "swr";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 type Props = {};
 
 function page({}: Props) {
@@ -63,20 +64,40 @@ function page({}: Props) {
           glowRadius={30}
           glowOpacity={1}
           animationDuration={350}
-          // enableHover
+          enableHover={false}
           gap="1rem"
           maxWidth="64rem"
           padding="0"
           borderRadius="1rem"
           className="mt-2"
        >
-          {[
-            { title: "New Document", link: "/document1", icon: FilePlus, glowColor: "#737373" },
-            { title: "Document 2", link: "/document2", icon: Sheet, glowColor: "#f97316" },
-            { title: "Document 3", link: "/document3", icon: Sheet, glowColor: "#737373" },
-     
-          ].map((document, i) => {
-            const Icon = (document.icon ?? Sheet) as React.ElementType;
+          {(() => {
+            type Card = {
+              title: string;
+              link: string;
+              glowColor: string;
+              icon?: React.ElementType;
+              iconNode?: React.ReactNode;
+            };
+            const cards: Card[] = [
+              { title: "New Document", link: "/document1", icon: FilePlus, glowColor: "#737373" },
+              {
+                title: "Document 2",
+                link: "/document2",
+                glowColor: "#f97316",
+                iconNode: (
+                  <DotLottieReact
+                    src="https://lottie.host/998c2d8e-89f8-4d6c-82fb-452c2108604a/bLDcCbygKs.lottie"
+                    loop
+                    playOnHover
+                    className="h-10 w-10 md:h-24 md:w-24"
+                  />
+                ),
+              },
+              { title: "Document 3", link: "/document3", icon: Sheet, glowColor: "#737373" },
+            ];
+            return cards.map((document, i) => {
+              const Icon = (document.icon ?? Sheet) as React.ElementType;
             return (
               <GlowingCard
                 key={i}
@@ -91,13 +112,18 @@ function page({}: Props) {
                   className="flex flex-col items-center outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring"
                 >
                   <motion.span>
-                    <Icon className=" group-hover:rotate-6 transition-all text-foreground h-10 w-10 md:h-20 md:w-20" />
+                      {document.iconNode ? (
+                        document.iconNode
+                      ) : (
+                        <Icon className=" group-hover:rotate-6 transition-all text-foreground h-10 w-10 md:h-20 md:w-20" />
+                      )}
                   </motion.span>
                   <h3 className="mt-2 text-xs text-foreground md:text-base text-center font-semibold">{document.title}</h3>
                 </motion.a>
               </GlowingCard>
             );
-          })}
+            });
+          })()}
         </GlowingCards>
       </motion.section>
       <Separator className="my-6" />

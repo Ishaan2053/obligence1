@@ -71,7 +71,7 @@ export const CardCarousel: React.FC<CarouselProps> = ({
         </p>
       </div>
 
-          <div className="flex w-full items-center justify-center gap-4">
+          <div className="flex w-full items-center justify-center gap-6">
             <div className="w-full">
               <Swiper
                 spaceBetween={50}
@@ -103,32 +103,20 @@ export const CardCarousel: React.FC<CarouselProps> = ({
               >
                 {images.map((image, index) => (
                   <SwiperSlide key={index}>
-                    <div className="size-full rounded-3xl">
-                        <div className="absolute italic font-light top-2 left-2 z-10 flex items-center gap-2">
+                    <div className="size-full rounded-2xl border">
+                        <div className="p-4  backdrop-blur-sm italic font-light tracking-wider text-lg top-2 left-2 z-10 flex items-center gap-2">
                            "{image.testimonial}"</div>
-                      <Image
+                      {/* <Image
                         src={image.src}
                         width={500}
                         height={500}
                         className="size-full rounded-xl"
                         alt={image.alt}
-                      />
-                    </div>
+                      /> */}
+                      <div className="bg-accent"/>                    </div>
                   </SwiperSlide>
                 ))}
-                {images.map((image, index) => (
-                  <SwiperSlide key={index}>
-                    <div className="size-full rounded-3xl">
-                      <Image
-                        src={image.src}
-                        width={200}
-                        height={200}
-                        className="size-full rounded-xl"
-                        alt={image.alt}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+               
               </Swiper>
             </div>
           </div>

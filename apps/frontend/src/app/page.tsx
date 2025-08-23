@@ -1,3 +1,4 @@
+"use client";
 import Features from "@/components/landing/features";
 import Hero from "@/components/landing/hero";
 import { CardCarousel } from "@/components/ui/card-carousel";
@@ -7,6 +8,7 @@ import Navbar from "@/components/ui/navbar";
 import SmokeyCursor from "@/components/ui/smokey-cursor";
 import { TextScroll } from "@/components/ui/text-scroll";
 import { Timeline } from "@/components/ui/timeline";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function Home() {
   const images = [
@@ -69,20 +71,11 @@ export default function Home() {
             Drag and drop your contract or agreement as a PDF. Obligence accepts
             a variety of legal and business documents for instant processing.
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            <img
-              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-              alt="PDF upload"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-            />
-            <img
-              src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6"
-              alt="Document selection"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
+          <div className="grid grid-cols-1 w-full h-full gap-4">
+            <DotLottieReact
+              src="https://lottie.host/14b6bc14-5b90-4bfe-817d-9eff33972033/4A7HrFOdPz.lottie"
+              loop
+              autoplay
             />
           </div>
         </div>
@@ -97,20 +90,11 @@ export default function Home() {
             extracting key clauses, important dates, parties, and
             obligations—all in minutes.
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            <img
-              src="https://images.unsplash.com/photo-1487014679447-9f8336841d58"
-              alt="AI analysis"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-            />
-            <img
-              src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62"
-              alt="Document processing"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
+          <div className="grid grid-cols-1 w-full h-full gap-4">
+            <DotLottieReact
+              src="https://lottie.host/421a763f-afdd-458b-92cb-8b1ec436a7e3/LQY8DktRPJ.lottie"
+              loop
+              autoplay
             />
           </div>
         </div>
@@ -124,21 +108,12 @@ export default function Home() {
             If something in your contract is ambiguous or complex, Obligence
             automatically pauses and invites you to review flagged sections.
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            <img
-              src="https://images.unsplash.com/photo-1515165562835-c1cf5c366d82"
-              alt="Human review"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-            />
-            <img
-              src="https://images.unsplash.com/photo-1465101178521-c1a9136a3e43"
-              alt="Legal discussion"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-            />
+          <div className="grid grid-cols-1 w-full h-full gap-4">
+         <DotLottieReact
+      src="https://lottie.host/997adb2c-e460-48a1-b855-45460fedd961/gjMX1UkJpI.lottie"
+      loop
+      autoplay
+    />
           </div>
         </div>
       ),
@@ -152,21 +127,12 @@ export default function Home() {
             structured, searchable, and ready for business action or legal
             compliance.
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            <img
-              src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5"
-              alt="Contract insights"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-            />
-            <img
-              src="https://images.unsplash.com/photo-1473187983305-f615310e7daa"
-              alt="Dashboard view"
-              width={500}
-              height={500}
-              className="h-20 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset] md:h-44 lg:h-60"
-            />
+          <div className="grid grid-cols-1 w-full h-full gap-4">
+            <DotLottieReact
+      src="https://lottie.host/5d87a429-7e16-4b9c-b717-be02700ce76b/QOlSnYHRYH.lottie"
+      loop
+      autoplay
+    />
           </div>
         </div>
       ),
