@@ -16,7 +16,6 @@ import {
   Pagination,
 } from "swiper/modules";
 
-
 interface CarouselProps {
   images: { src: string; alt: string; testimonial: string }[];
   autoplayDelay?: number;
@@ -62,14 +61,18 @@ export const CardCarousel: React.FC<CarouselProps> = ({
       <style>{css}</style>
       <div className="mx-auto w-full max-w-4xl rounded-2xl p-2 shadow-sm md:rounded-t-[44px]">
         <div className="relative mx-auto flex w-full flex-col rounded-[24px] border border-black/5  p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
-           <div className="max-w-4xl mx-auto py-20 px-4 md:px-8 lg:px-10">
-        <h2 className="text-lg md:text-7xl mb-4 max-w-4xl tracking-tighter text-balance ">
-        Don't just take our word for it... <br/><span className="tracking-tighter text-balance text-transparent from-primary/10 via-foreground/85 to-foreground/50 bg-gradient-to-tl bg-clip-text">See what others are saying!</span>
-        </h2>
-        <p className=" text-sm md:text-base max-w-sm">
-         Discover why our users are absolutely raving about us! These are genuine experiences from real people who've unlocked the magic.
-        </p>
-      </div>
+          <div className="max-w-4xl mx-auto py-20 px-4 md:px-8 lg:px-10">
+            <h2 className="text-lg md:text-7xl mb-4 max-w-4xl tracking-tighter text-balance ">
+              Don't just take our word for it... <br />
+              <span className="tracking-tighter text-balance text-transparent from-primary/10 via-foreground/85 to-foreground/50 bg-gradient-to-tl bg-clip-text">
+                See what others are saying!
+              </span>
+            </h2>
+            <p className=" text-sm md:text-base max-w-sm">
+              Discover why our users are absolutely raving about us! These are
+              genuine experiences from real people who've unlocked the magic.
+            </p>
+          </div>
 
           <div className="flex w-full items-center justify-center gap-6">
             <div className="w-full">
@@ -104,9 +107,16 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                 {images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <div className="size-full py-10 space-y-4 px-4 backdrop-blur-md rounded-2xl border">
-                      <div className="flex"><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /></div>
-                        <div className="backdrop-blur-sm italic font-light tracking-wider text-lg top-2 left-2 z-10 flex items-center gap-2">
-                           "{image.testimonial}"</div>
+                      <div className="flex">
+                        <StarIcon className=" h-4 w-4 text-yellow-300/80" />
+                        <StarIcon className=" h-4 w-4 text-yellow-300/80" />
+                        <StarIcon className=" h-4 w-4 text-yellow-300/80" />
+                        <StarIcon className=" h-4 w-4 text-yellow-300/80" />
+                        <StarIcon className=" h-4 w-4 text-yellow-300/80" />
+                      </div>
+                      <div className="backdrop-blur-sm italic font-light tracking-wider text-lg top-2 left-2 z-10 flex items-center gap-2">
+                        "{image.testimonial}"
+                      </div>
                       {/* <Image
                         src={image.src}
                         width={500}
@@ -114,10 +124,10 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                         className="size-full rounded-xl"
                         alt={image.alt}
                       /> */}
-                      <div className="bg-accent"/>                    </div>
+                      <div className="bg-accent" />{" "}
+                    </div>
                   </SwiperSlide>
                 ))}
-               
               </Swiper>
             </div>
           </div>
