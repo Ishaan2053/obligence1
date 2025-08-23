@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, ChevronRight, Github, SparklesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Hero() {
 return (
@@ -111,8 +112,10 @@ return (
             </div>
             </div>
             <div className="relative">
-            <img
-                src="https://i.postimg.cc/0yk8Vz7t/dashboard.webp"
+            <Image
+            height={500}
+            width={500}
+                src="/cover.png"
                 alt="Dashboard Preview"
                 className="w-full"
             />
