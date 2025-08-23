@@ -23,6 +23,8 @@ import {
   Code2,
   CheckCircle,
   ArrowLeft,
+  ArrowRight,
+  ArrowRightCircleIcon,
 } from "lucide-react";
 import React from "react";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
@@ -77,21 +79,56 @@ function Page({}: Props) {
   const [tag, setTag] = React.useState<
     "none" | "draft" | "confidential" | "internal" | "public"
   >("none");
+  const [name, setName] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [file, setFile] = React.useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitMessage, setSubmitMessage] = React.useState<string | null>(null);
+
+  const isFormValid =
+    name.trim().length > 0 &&
+    description.trim().length > 0 &&
+    tag !== "none" &&
+    !!file &&
+    !!selectedId;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isFormValid || isSubmitting) return;
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append("name", name.trim());
+      formData.append("description", description.trim());
+      formData.append("tag", tag);
+      formData.append("template", selectedId!);
+      if (file) formData.append("file", file);
+
+      // Dummy API endpoint to scaffold code; echoes back request
+      const res = await fetch("https://httpbin.org/post", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      const data = await res.json();
+      // Provide minimal success feedback
+      setSubmitMessage("Submitted successfully.");
+      // Optional: reset form
+      // setName(""); setDescription(""); setTag("none"); setFile(null); setSelectedId(null); setStep(1);
+      console.log("Dummy API response:", data);
+    } catch (err: any) {
+      console.error(err);
+      setSubmitMessage("Submission failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
-    <div className="space-y-6">
+    <form className="space-y-6" onSubmit={handleSubmit}>
       {/* HEADER */}
       <section className="">
         <div className="flex items-center gap-3">
-          {step === 2 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setStep(1)}
-              aria-label="Go back to previous step"
-            >
-              <ArrowLeft /> Back
-            </Button>
-          )}
           <h1 className="text-2xl font-semibold">Create New Document</h1>
         </div>
       </section>
@@ -115,22 +152,29 @@ function Page({}: Props) {
               description
             </h2>
             <div className="flex gap-6 items-start">
-              <div className="w-1/2 space-y-4">
+        <div className="w-1/2 space-y-4">
                 <Label>Document Name</Label>
                 <Input
                   type="text"
                   placeholder="Enter document name"
-                  className="mb-4"
+          className="mb-4"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
                 />
                 <Label>Document Description</Label>
                 <Textarea
                   placeholder="Enter document description"
-                  className="mb-4"
+          className="mb-4"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
                 />
                 <div className="flex items-center gap-3">
                   <Label htmlFor="tag-none">Document Tag</Label>
                   {tag !== "none" && (
-                    <Badge variant="outline" className="capitalize rounded-full">
+                    <Badge
+                      variant="outline"
+                      className="capitalize rounded-full"
+                    >
                       {tag}
                     </Badge>
                   )}
@@ -216,7 +260,9 @@ function Page({}: Props) {
                       e.preventDefault();
                       e.currentTarget.classList.remove("bg-gray-50");
                       const files = e.dataTransfer.files;
-                      console.log("Files dropped:", files);
+                      if (files && files.length > 0) {
+                        setFile(files[0]);
+                      }
                     }}
                     onClick={() =>
                       document.getElementById("file-upload")?.click()
@@ -236,13 +282,20 @@ function Page({}: Props) {
                     className="hidden"
                     onChange={(e) => {
                       const files = e.target.files;
-                      console.log("Files selected:", files);
+                      if (files && files.length > 0) {
+                        setFile(files[0]);
+                      }
                     }}
                   />
+                  {file && (
+                    <p className="mt-3 text-xs text-muted-foreground truncate w-full text-center">
+                      Selected: {file.name}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
-            <Button onClick={() => setStep(2)}>
+            <Button className="w-fit" type="button" onClick={() => setStep(2)}>
               Next <ArrowRightCircle />
             </Button>
           </motion.section>
@@ -383,15 +436,39 @@ function Page({}: Props) {
               </div>
             </LayoutGroup>
 
-            <div>
-              <Button>
-                Submit <ArrowRightCircle />
+            <div className="flex items-center space-x-2">
+              {step === 2 && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  type="button"
+                  onClick={() => setStep(1)}
+                  aria-label="Go back to previous step"
+                >
+                  <ArrowLeft /> Back
+                </Button>
+              )}
+              <Button
+                size="lg"
+                type="submit"
+                disabled={!isFormValid || isSubmitting}
+                aria-disabled={!isFormValid || isSubmitting}
+                className="group bg-primary text-primary-foreground hover:shadow-primary/30 relative overflow-hidden rounded-full px-6 shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="relative z-10 flex items-center">
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                  <ArrowRightCircleIcon className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+                <span className="from-primary via-primary/90 to-primary/80 absolute inset-0 z-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
               </Button>
+              {submitMessage && (
+                <p className="text-sm text-muted-foreground ml-2">{submitMessage}</p>
+              )}
             </div>
           </motion.section>
         )}
       </AnimatePresence>
-    </div>
+    </form>
   );
 }
 

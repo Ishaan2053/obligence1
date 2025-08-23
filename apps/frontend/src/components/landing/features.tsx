@@ -31,7 +31,7 @@ const BentoGridItem = ({
     <motion.div
       variants={variants}
       className={cn(
-        'group border-primary/10 bg-background hover:border-primary/30 relative flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-xl border px-6 pt-6 pb-10 shadow-md transition-all duration-500',
+        'group border-primary/10 bg-background hover:border-primary/30 relative flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border px-6 pt-6 pb-10 shadow-md transition-all duration-500',
         className,
       )}
     >
@@ -49,10 +49,7 @@ const BentoGridItem = ({
           <h3 className="mb-2 text-xl font-semibold tracking-tight">{title}</h3>
           <p className="text-muted-foreground text-sm">{description}</p>
         </div>
-        <div className="text-primary mt-4 flex items-center text-sm">
-          <span className="mr-1">Learn more</span>
-          <ArrowRight className="size-4 transition-all duration-500 group-hover:translate-x-2" />
-        </div>
+
       </div>
       <div className="from-primary to-primary/30 absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r blur-2xl transition-all duration-500 group-hover:blur-lg" />
     </motion.div>

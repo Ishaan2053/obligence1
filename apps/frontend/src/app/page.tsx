@@ -202,6 +202,7 @@ export default function Home() {
         velocityDissipation={5}
         colorUpdateSpeed={20}
         simulationResolution={64}
+        dyeResolution={512}
         backgroundColor={{ r: 0.8, g: 0.1, b: 0 }}
       />
     </div>
