@@ -54,7 +54,7 @@ export default function CTA() {
                   "group cursor-pointer group gap-2  h-[64px] flex items-center p-[11px] rounded-full"
                 )}
               >
-                <div className="border border-border bg-[#ff3f17]  h-[43px] rounded-full flex items-center justify-center text-white">
+                <div className="border bg-white border-border h-[43px] rounded-full flex items-center justify-center text-black">
                   <p className="font-medium tracking-tight mr-3 ml-2 flex items-center gap-2 justify-center ">
                     Get started
                   </p>

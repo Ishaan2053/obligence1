@@ -8,7 +8,7 @@ import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { SparklesIcon } from "lucide-react";
+import { SparklesIcon, StarIcon } from "lucide-react";
 import {
   Autoplay,
   EffectCoverflow,
@@ -103,8 +103,9 @@ export const CardCarousel: React.FC<CarouselProps> = ({
               >
                 {images.map((image, index) => (
                   <SwiperSlide key={index}>
-                    <div className="size-full rounded-2xl border">
-                        <div className="p-4  backdrop-blur-sm italic font-light tracking-wider text-lg top-2 left-2 z-10 flex items-center gap-2">
+                    <div className="size-full py-10 space-y-4 px-4 backdrop-blur-md rounded-2xl border">
+                      <div className="flex"><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /><StarIcon className=" h-4 w-4 text-yellow-300/80" /></div>
+                        <div className="backdrop-blur-sm italic font-light tracking-wider text-lg top-2 left-2 z-10 flex items-center gap-2">
                            "{image.testimonial}"</div>
                       {/* <Image
                         src={image.src}
