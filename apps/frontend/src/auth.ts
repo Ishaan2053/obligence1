@@ -38,8 +38,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
     trustHost: true,
     debug: process.env.NODE_ENV === "development",
     providers: [
-      GitHub,
-      Google,
+      GitHub({
+        allowDangerousEmailAccountLinking: true,
+      }),
+      Google({
+        allowDangerousEmailAccountLinking: true,
+      }),
       CredentialsProvider({
         credentials: {
           email: { label: "Email", type: "email" },

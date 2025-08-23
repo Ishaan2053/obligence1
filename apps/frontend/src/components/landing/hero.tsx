@@ -63,10 +63,10 @@ return (
         transition={{ duration: 0.5, delay: 0.3 }}
         className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
-        <Link href="/signup">
+        <Link href="/signup" >
             <Button
             size="lg"
-            className="group bg-primary text-primary-foreground hover:shadow-primary/30 relative overflow-hidden rounded-full px-6 shadow-lg transition-all duration-300"
+            className="group cursor-pointer bg-primary text-primary-foreground hover:shadow-primary/30 relative overflow-hidden rounded-full px-6 shadow-lg transition-all duration-300"
             >
             <span className="relative z-10 flex items-center">
                 Get Started
@@ -76,11 +76,11 @@ return (
             </Button>
         </Link>
 
-        <Link href="https://github.com/kyrexi/obligence" target="_blank">
+        <Link href="https://github.com/kyrexi/obligence" target="_blank" >
             <Button
             size="lg"
             variant="outline"
-            className="border-border bg-background/50  rounded-full backdrop-blur-sm flex items-center gap-2"
+            className="border-border cursor-pointer bg-background/50  rounded-full backdrop-blur-sm flex items-center gap-2"
             >
             <Github className="h-4 w-4" />
             Star on GitHub
