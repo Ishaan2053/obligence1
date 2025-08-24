@@ -17,17 +17,17 @@ import {
 import {
   ArrowRightCircle,
   UploadIcon,
-  FileText,
-  BookText,
-  Presentation,
-  Code2,
+Settings,
   CheckCircle,
   ArrowLeft,
   ArrowRight,
   ArrowRightCircleIcon,
+  ShoppingCart,
+  UserCheck,
 } from "lucide-react";
 import React from "react";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { LockIcon } from "lucide-react";
 
 type Props = {};
 
@@ -40,36 +40,36 @@ function Page({}: Props) {
     long: string;
   };
 
-  const templates: Template[] = [
-    {
-      id: "report",
-      name: "Report",
-      icon: <FileText className="h-5 w-5" />,
-      short: "Structured summary with sections.",
-      long: "A concise, structured document ideal for status updates, research summaries, and analytical write-ups. Includes headings for overview, findings, and recommendations.",
-    },
-    {
-      id: "article",
-      name: "Article",
-      icon: <BookText className="h-5 w-5" />,
-      short: "Narrative format with flow.",
-      long: "A reader-friendly narrative format suitable for blogs, knowledge base entries, and editorial content. Emphasizes clarity, subheadings, and scannability.",
-    },
-    {
-      id: "presentation",
-      name: "Presentation",
-      icon: <Presentation className="h-5 w-5" />,
-      short: "Slide-like bullet structure.",
-      long: "Slide-oriented outline designed for decks and talks. Focuses on bullet points, key takeaways, and visual pacing across sections.",
-    },
-    {
-      id: "technical",
-      name: "Technical Spec",
-      icon: <Code2 className="h-5 w-5" />,
-      short: "API, schema, and constraints.",
-      long: "A detailed specification template for technical documentation, including context, requirements, API shapes, edge cases, and acceptance criteria.",
-    },
-  ];
+const templates: Template[] = [
+  {
+    id: "nda",
+    name: "Non-Disclosure Agreement",
+    icon: <LockIcon className="h-5 w-5" />,
+    short: "Key party and confidentiality terms.",
+    long: "Extracts core elements of NDAs including identification of confidential parties, detailed confidentiality obligations, term lengths, permitted disclosures, and breach consequences. This template enables fast parsing of sensitive privacy agreements, ensuring your organization remains protected and compliant with data security requirements.",
+  },
+  {
+    id: "sales_contract",
+    name: "Sales Contract",
+    icon: <ShoppingCart className="h-5 w-5" />,
+    short: "Terms on delivery, payment, and liabilities.",
+    long: "Focuses on purchase terms, payment schedules, delivery obligations, warranties, liability limitations, and dispute resolution clauses. This template streamlines the review of commercial agreements by highlighting financial commitments, risk allocations, and important deadlines to minimize transactional risks and improve contract lifecycle management.",
+  },
+  {
+    id: "employment_offer",
+    name: "Employment Offer",
+    icon: <UserCheck className="h-5 w-5" />,
+    short: "Compensation, benefits, and obligations.",
+    long: "Targets employee offer letters and contracts by extracting salary details, bonus structures, benefits, confidentiality clauses, non-compete agreements, termination terms, and job duties. This comprehensive template empowers HR and legal teams to onboard employees efficiently while ensuring clarity and legal compliance in employment terms.",
+  },
+  {
+    id: "service_agreement",
+    name: "Service Agreement",
+    icon: <Settings className="h-5 w-5" />,
+    short: "Scope, deliverables, and payment terms.",
+    long: "Extracts detailed information on contract scope, defined deliverables, timelines, payment terms, performance standards, intellectual property rights, confidentiality, and termination conditions. This service agreement template helps both providers and clients quickly align expectations and manage risks throughout the service engagement.",
+  },
+];
 
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const selected = templates.find((t) => t.id === selectedId) || null;
@@ -99,21 +99,23 @@ function Page({}: Props) {
     setSubmitMessage(null);
     try {
       const formData = new FormData();
-      formData.append("name", name.trim());
-      formData.append("description", description.trim());
-      formData.append("tag", tag);
-      formData.append("template", selectedId!);
       if (file) formData.append("file", file);
+      const metadata = {
+        name: name.trim(),
+        description: description.trim(),
+        tag,
+        template: selectedId!,
+      };
+      formData.append("metadata", JSON.stringify(metadata));
 
-      // Dummy API endpoint to scaffold code; echoes back request
-      const res = await fetch("https://httpbin.org/post", {
+      const res = await fetch("/api/contracts/upload", {
         method: "POST",
         body: formData,
       });
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
       const data = await res.json();
       // Provide minimal success feedback
-      setSubmitMessage("Submitted successfully.");
+      setSubmitMessage("Uploaded successfully.");
       // Optional: reset form
       // setName(""); setDescription(""); setTag("none"); setFile(null); setSelectedId(null); setStep(1);
       console.log("Dummy API response:", data);
@@ -270,10 +272,10 @@ function Page({}: Props) {
                   >
                     <UploadIcon className="text-muted-foreground h-24 w-24" />
                     <p className="text-sm font-medium text-muted-foreground">
-                      Drag and drop your document here
+                      Drag and drop  or click to browse files
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      or click to browse files
+                     Supported format: PDF (max: 100MB)
                     </p>
                   </div>
                   <input
