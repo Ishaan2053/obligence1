@@ -101,12 +101,13 @@ async def get_analysis_result(contract_id: str, userid: str):
 
 
 async def get_all_analysis_results(
-    userid: str, skip: int = 0, limit: int = 100
+    userid: str, skip: int = 0, limit: int = 100, sort: str = "asc"
 ) -> list:
     cursor = (
         analysis_results_collection.find({"user": ObjectId(userid)})
         .skip(skip)
         .limit(limit)
+        .sort("created_at", 1 if sort == "asc" else -1)
     )
     results = await cursor.to_list(length=limit)
     return serialize_document(results)

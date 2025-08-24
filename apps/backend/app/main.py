@@ -93,6 +93,7 @@ async def get_all_contract_results(
     userid: str = Query(...),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
+    sort: str = Query("asc", enum=["asc", "desc"])
 ):
     """
     Retrieve all contract results with pagination.
@@ -102,7 +103,7 @@ async def get_all_contract_results(
     - **userid**: ID of the user requesting the results.
     """
     try:
-        results = await get_all_analysis_results(userid, skip, limit)
+        results = await get_all_analysis_results(userid, skip, limit, sort)
     except Exception as error:
         logger.error(f"Error retrieving contract results: {error}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
