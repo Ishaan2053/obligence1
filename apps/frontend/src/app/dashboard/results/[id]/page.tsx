@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 import useSWR from "swr"
 import { useParams } from "next/navigation"
 import { Users, Calendar, DollarSign, RefreshCw, FileDown, AlertTriangle, CheckCircle2, ChevronDown, Printer } from "lucide-react"
@@ -13,6 +14,7 @@ import { ReportSkeleton } from "@/app/dashboard/results/skeletons";
 
 type Obligation = { party: string; text: string }
 type Clarification = { id: string; status: "resolved" | "pending" | "ambiguous" }
+type UnclearSection = { section: string; issue: string; priority: string }
 type ContractReport = {
   contract_id: string
   status: string
@@ -21,6 +23,7 @@ type ContractReport = {
   dates: { effective_date: string; termination_date?: string; renewal?: string }
   obligations: Obligation[]
   clarifications?: Clarification[]
+  unclearSections?: UnclearSection[]
 }
 
 // Backend response (subset) for mapping
@@ -115,7 +118,8 @@ const fetchContract = async (_key: string, contractId: string): Promise<Contract
     parties,
     dates,
     obligations,
-    clarifications,
+  clarifications,
+  unclearSections: (r.unclear_sections || []).map((u) => ({ section: u.section, issue: u.issue, priority: u.priority })),
   }
   return vm
 }
@@ -418,6 +422,30 @@ function ReportView({ data }: { data: ContractReport }) {
               </details>
             </div>
           </CardContent>
+
+          {data.unclearSections && data.unclearSections.length > 0 && (
+            <div className="px-6 pb-6">
+              <h3 className="mb-3 text-sm font-medium">Unclear sections</h3>
+              <Accordion type="single" collapsible className="w-full">
+                {data.unclearSections.map((u, idx) => {
+                  const variant = u.priority?.toLowerCase() === "high" ? "destructive" : u.priority?.toLowerCase() === "medium" ? "default" : "secondary"
+                  return (
+                    <AccordionItem key={idx} value={`unclear-${idx}`}>
+                      <AccordionTrigger>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={variant as any} className="rounded-full capitalize">{u.priority || "unknown"}</Badge>
+                          <span className="text-sm font-medium">{u.section || `Unclear section ${idx + 1}`}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <p className="text-sm leading-6 text-foreground/90">{u.issue || "No details provided."}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )
+                })}
+              </Accordion>
+            </div>
+          )}
         </Card>
 
         {/* Obligations by party */}
