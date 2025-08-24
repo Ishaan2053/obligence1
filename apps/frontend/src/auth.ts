@@ -95,7 +95,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
           session.user._id = token._id || "";
           session.user.image = token.image || "";
         }
-        console.log (session);
+        // console.log (session);
         return session;
       },
     },
