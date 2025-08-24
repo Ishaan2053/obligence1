@@ -9,7 +9,7 @@ function buildBackendUrl(contractId: string, userId: string) {
   )}?userid=${encodeURIComponent(userId)}`;
 }
 
-export async function POST(_req: NextRequest, { params }: { params: { contract_id: string } }) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ contract_id: string }> }) {
   try {
     if (!BACKEND_URL) {
       return NextResponse.json({ error: "Backend URL not configured" }, { status: 500 });
@@ -20,7 +20,8 @@ export async function POST(_req: NextRequest, { params }: { params: { contract_i
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const contractId = params?.contract_id;
+  const { contract_id } = await params;
+  const contractId = contract_id;
     if (!contractId) {
       return NextResponse.json({ error: "contract_id is required" }, { status: 400 });
     }
@@ -44,7 +45,7 @@ export async function POST(_req: NextRequest, { params }: { params: { contract_i
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { contract_id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ contract_id: string }> }) {
   try {
     if (!BACKEND_URL) {
       return NextResponse.json({ error: "Backend URL not configured" }, { status: 500 });
@@ -55,7 +56,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: { contract
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const contractId = params?.contract_id;
+  const { contract_id } = await params;
+  const contractId = contract_id;
     if (!contractId) {
       return NextResponse.json({ error: "contract_id is required" }, { status: 400 });
     }
@@ -78,3 +80,5 @@ export async function DELETE(_req: NextRequest, { params }: { params: { contract
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+

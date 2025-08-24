@@ -47,10 +47,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 import { SearchDialog } from "./search";
+import { toast } from "sonner";
 
 export function AppSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [starringId, setStarringId] = useState<string | null>(null);
   const { toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -70,6 +72,44 @@ export function AppSidebar() {
    fetcher
   );
   const reports = reportsData?.reports ?? [];
+
+  const starReport = async (contractId: string) => {
+    if (!contractId || starringId) return;
+    setStarringId(contractId);
+    await toast.promise(
+      fetch(`/api/contracts/result/star/${encodeURIComponent(contractId)}`, {
+        method: "POST",
+      }).then((res) => {
+        if (!res.ok) throw new Error(`Star failed: ${res.status}`);
+        return res;
+      }),
+      {
+        loading: "Starring report…",
+        success: "Report starred",
+        error: (err) => err?.message || "Failed to star report",
+      }
+    );
+    setStarringId(null);
+  };
+
+  const unstarReport = async (contractId: string) => {
+    if (!contractId || starringId) return;
+    setStarringId(contractId);
+    await toast.promise(
+      fetch(`/api/contracts/result/star/${encodeURIComponent(contractId)}`, {
+        method: "DELETE",
+      }).then((res) => {
+        if (!res.ok) throw new Error(`Unstar failed: ${res.status}`);
+        return res;
+      }),
+      {
+        loading: "Unstarring report…",
+        success: "Report unstarred",
+        error: (err) => err?.message || "Failed to unstar report",
+      }
+    );
+    setStarringId(null);
+  };
 
   return (
     <Sidebar collapsible="icon" className="">
@@ -178,8 +218,25 @@ export function AppSidebar() {
       </SidebarMenuAction>
     </DropdownMenuTrigger>
     <DropdownMenuContent side="right" align="start">
-      <DropdownMenuItem>
-        <span>Star</span>
+      <DropdownMenuItem
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          starReport(report.id);
+        }}
+        disabled={starringId === report.id}
+      >
+        <span>{starringId === report.id ? "Starring…" : "Star"}</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          unstarReport(report.id);
+        }}
+        disabled={starringId === report.id}
+      >
+        <span>{starringId === report.id ? "Unstarring…" : "Unstar"}</span>
       </DropdownMenuItem>
       <DropdownMenuItem>
         <span>Delete Report</span>

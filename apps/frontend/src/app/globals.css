@@ -43,6 +43,25 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+@layer utilities {
+  .globalScroll {
+    overflow: auto;
+    /* scrollbar-width: thin; */
+    scrollbar-color: hsl(var(--primary)) ;
+  }
+  .globalScroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .globalScroll::-webkit-scrollbar-track {
+    background: hsl(var(--secondary)) ;
+  }
+  .globalScroll::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary));
+    border-radius: 9999px;
+  }
+}
+
 :root {
    --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
