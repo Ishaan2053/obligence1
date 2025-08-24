@@ -7,7 +7,6 @@ set -e
 
 DOMAIN="agent.kyrexi.tech"
 EMAIL="tripathipranav14@gmail.com" 
-PROJECT_DIR="/opt/obligence-backend"
 
 # Colors
 GREEN='\033[0;32m'
@@ -48,8 +47,6 @@ warning() {
 # Setup SSL certificate
 setup_ssl() {
     log "Setting up SSL certificate..."
-    
-    cd $PROJECT_DIR
     
     # Ensure we're using HTTP-only config
     sudo -u obligence cp nginx/conf.d/initial.conf nginx/conf.d/default.conf
