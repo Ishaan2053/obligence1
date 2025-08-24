@@ -5,15 +5,8 @@ services:
       dockerfile: Dockerfile
     expose:
       - "8000"
-    environment:
-      - MONGO_DB_URI=${MONGO_DB_URI}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - S3_REGION=${S3_REGION}
-      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
-      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
-      - PORTIA_API_KEY=${PORTIA_API_KEY}
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    env_file:
+      - .env.production
     volumes:
       - ./logs:/app/logs
     restart: unless-stopped
