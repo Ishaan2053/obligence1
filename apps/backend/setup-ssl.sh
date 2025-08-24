@@ -49,10 +49,10 @@ setup_ssl() {
     log "Setting up SSL certificate..."
     
     # Ensure we're using HTTP-only config
-    sudo -u obligence cp nginx/conf.d/initial.conf nginx/conf.d/default.conf
+    sudo cp nginx/conf.d/initial.conf nginx/conf.d/default.conf
     
     # Restart nginx with HTTP config
-    sudo -u obligence docker-compose restart nginx
+    sudo docker-compose restart nginx
     
     # Wait for nginx to start
     sleep 5
@@ -63,11 +63,11 @@ setup_ssl() {
     fi
     
     # Stop existing certbot container if running
-    sudo -u obligence docker-compose stop certbot 2>/dev/null || true
+    sudo docker-compose stop certbot 2>/dev/null || true
     
     # Request certificate
     log "Requesting SSL certificate from Let's Encrypt..."
-    sudo -u obligence docker-compose run --rm certbot \
+    sudo docker-compose run --rm certbot \
         certbot certonly \
         --webroot \
         --webroot-path=/var/www/certbot \
@@ -84,11 +84,11 @@ setup_ssl() {
     
     # Switch to HTTPS configuration
     log "Switching to HTTPS configuration..."
-    sudo -u obligence cp nginx/conf.d/agent.kyrexi.tech.conf nginx/conf.d/default.conf
-    
+    sudo cp nginx/conf.d/agent.kyrexi.tech.conf nginx/conf.d/default.conf
+
     # Restart nginx
-    sudo -u obligence docker-compose restart nginx
-    
+    sudo docker-compose restart nginx
+
     # Test HTTPS
     sleep 5
     if curl -s "https://$DOMAIN/health" > /dev/null; then
