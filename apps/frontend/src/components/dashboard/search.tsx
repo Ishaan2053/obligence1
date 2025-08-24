@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search as SearchIcon, Loader2, FileText, Clock, X } from "lucide-react";
+import { Search as SearchIcon, Loader2, FileText, Clock, X, History } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
@@ -16,6 +16,7 @@ import { Separator } from "../ui/separator";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type Report = { id: string; name: string; date?: string; summary?: string };
+type RecentDoc = { id: string; title: string; editedAt: string; summary?: string };
 
 export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (open: boolean) => void }) {
   const [query, setQuery] = useState("");
@@ -25,6 +26,11 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
     debouncedQuery ? `/api/reports?search=${debouncedQuery}` : null,
     fetcher
   );
+
+  // Recent documents when there is no query
+  const { data: recentPayload, isLoading: recentLoading } = useSWR<{
+    documents: RecentDoc[];
+  }>(!debouncedQuery ? "/api/recent-documents" : null, fetcher);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -36,8 +42,10 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
     };
   }, [query]);
 
-  const showEmptyHint = !query && !isLoading;
+  const showEmptyHint = !query && !isLoading && !recentLoading;
   const hasResults = !!reports && reports.length > 0;
+  const recentDocs = recentPayload?.documents ?? [];
+  const hasRecent = !debouncedQuery && recentDocs.length > 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -73,7 +81,7 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
 
         {/* Content area */}
         <div className="mt-3 max-h-72 overflow-y-auto pr-1">
-          {showEmptyHint && (
+          {/* {showEmptyHint && (
             <motion.div
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
@@ -82,6 +90,56 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
               <SearchIcon className="h-4 w-4" />
               Start typing to search your reports
             </motion.div>
+          )} */}
+
+          {/* Recent documents list */}
+          {!debouncedQuery && (recentLoading || hasRecent) && (
+            <div className="mt-2">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+                <History className="h-3.5 w-3.5" /> Recent documents
+              </div>
+              {recentLoading && (
+                <div className="space-y-2">
+                  <Skeleton className="h-6" />
+                  <Skeleton className="h-6" />
+                </div>
+              )}
+              {!recentLoading && hasRecent && (
+                <ul>
+                  <AnimatePresence initial={false}>
+                    {recentDocs.map((doc) => (
+                      <motion.li
+                        key={`recent-${doc.id}`}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.15 }}
+                        className="my-2"
+                      >
+                        <Link
+                          href={`/dashboard/results/${doc.id}`}
+                          className="flex items-center gap-3 px-2 py-2 rounded-2xl hover:bg-accent/60 transition"
+                          onClick={() => onClose(false)}
+                        >
+                          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-foreground">
+                            <FileText className="h-4 w-4" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium truncate">{doc.title}</div>
+                            <div className="text-xs text-muted-foreground truncate">
+                              {doc.summary ?? `Last edited: ${new Date(doc.editedAt).toLocaleString()}`}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            {new Date(doc.editedAt).toLocaleDateString()}
+                          </div>
+                        </Link>
+                      </motion.li>
+                    ))}
+                  </AnimatePresence>
+                </ul>
+              )}
+            </div>
           )}
 
           {isLoading && (
