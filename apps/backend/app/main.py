@@ -117,7 +117,7 @@ async def get_contract_result(contract_id: str, userid: str):
     )
 
 
-@router.get("/contracts/result/all")
+@router.get("/contracts/results/all")
 async def get_all_contract_results(
     userid: str = Query(...),
     skip: int = Query(0, ge=0),
