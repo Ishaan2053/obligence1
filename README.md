@@ -131,4 +131,6 @@ obligence/
 ├── infrastructure/ # Docker, scripts, infra-as-code
 └── README.md
 ```
+<div align="center">
 ⭐ Made by [Ishaan](https://github.com/ishaan2053) and [Pranav Tripathi](http://github.com/prnvtripathi) during AgentHack 2025 ⭐
+</div>
