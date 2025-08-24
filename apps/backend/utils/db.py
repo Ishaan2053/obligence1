@@ -114,7 +114,7 @@ async def get_all_analysis_results(
     for item in results:
         contract_id = item["contract_id"]
         item["contract_id"] = str(contract_id)
-        
+
         # Fetch the contract information
         contract = await contracts_collection.find_one({"_id": contract_id})
         if contract:
@@ -187,8 +187,21 @@ async def unstar_analysis_result(contract_id: str, user: str):
 
 
 async def get_starred_analysis_results(user: str) -> list:
-    cursor = analysis_results_collection.find({"user": ObjectId(user), "starred": True})
-    results = await cursor.to_list(length=100)
+    cursor = analysis_results_collection.find(
+        {"user": ObjectId(user), "starred": True}
+    ).sort("created_at", -1)
+    results = await cursor.to_list(length=5)
+    # Then populate the contract with the contract_id
+    for item in results:
+        contract_id = item["contract_id"]
+        item["contract_id"] = str(contract_id)
+
+        # Fetch the contract information
+        contract = await contracts_collection.find_one({"_id": contract_id})
+        if contract:
+            item["contract"] = serialize_document(contract)
+        else:
+            item["contract"] = None
     return serialize_document(results)
 
 
