@@ -11,26 +11,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Search as SearchIcon, Loader2, FileText, Clock, X, History } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Separator } from "../ui/separator";
+import { Report } from "@/types/report.type";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-type Report = { id: string; name: string; date?: string; summary?: string };
-type RecentDoc = { id: string; title: string; editedAt: string; summary?: string };
-
-export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (open: boolean) => void }) {
+export function SearchDialog({ isOpen, onClose, recentData }: { isOpen: boolean; onClose: (open: boolean) => void; recentData: Report[] }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<Report[]>([]);
 
-  const { data: reports, isLoading } = useSWR<Report[]>(
-    debouncedQuery ? `/api/reports?search=${debouncedQuery}` : null,
-    fetcher
-  );
-
-  // Recent documents when there is no query
-  const { data: recentPayload, isLoading: recentLoading } = useSWR<{
-    documents: RecentDoc[];
-  }>(!debouncedQuery ? "/api/recent-documents" : null, fetcher);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -42,10 +32,26 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
     };
   }, [query]);
 
-  const showEmptyHint = !query && !isLoading && !recentLoading;
-  const hasResults = !!reports && reports.length > 0;
-  const recentDocs = recentPayload?.documents ?? [];
-  const hasRecent = !debouncedQuery && recentDocs.length > 0;
+
+  const handleSearch = async () => {
+    if (!debouncedQuery) return;
+
+    setIsLoading(true);
+    try {
+      // check if the query is in the recent data
+      const filteredResults = recentData.filter((report) =>
+        report?.contract?.metadata?.name?.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+        report?.result?.summary?.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+        report?._id?.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+        report?.created_at?.toLowerCase().includes(debouncedQuery.toLowerCase())
+      );
+      setResults(filteredResults);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -61,7 +67,10 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
             type="text"
             placeholder="Search by report name or ID..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              handleSearch();
+            }}
             className="pl-10 pr-10"
             autoFocus
           />
@@ -93,23 +102,17 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
           )} */}
 
           {/* Recent documents list */}
-          {!debouncedQuery && (recentLoading || hasRecent) && (
+          {!debouncedQuery && recentData && (
             <div className="mt-2">
               <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                 <History className="h-3.5 w-3.5" /> Recent documents
               </div>
-              {recentLoading && (
-                <div className="space-y-2">
-                  <Skeleton className="h-6" />
-                  <Skeleton className="h-6" />
-                </div>
-              )}
-              {!recentLoading && hasRecent && (
+              {recentData && (
                 <ul>
                   <AnimatePresence initial={false}>
-                    {recentDocs.map((doc) => (
+                    {recentData.map((doc) => (
                       <motion.li
-                        key={`recent-${doc.id}`}
+                        key={`recent-${doc._id}`}
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -6 }}
@@ -117,7 +120,7 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
                         className="my-2"
                       >
                         <Link
-                          href={`/dashboard/results/${doc.id}`}
+                          href={`/dashboard/results/${doc._id}`}
                           className="flex items-center gap-3 px-2 py-2 rounded-2xl hover:bg-accent/60 transition"
                           onClick={() => onClose(false)}
                         >
@@ -125,13 +128,13 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
                             <FileText className="h-4 w-4" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-sm font-medium truncate">{doc.title}</div>
+                            <div className="text-sm font-medium truncate">{doc?.contract?.metadata?.name}</div>
                             <div className="text-xs text-muted-foreground truncate">
-                              {doc.summary ?? `Last edited: ${new Date(doc.editedAt).toLocaleString()}`}
+                              {doc?.result?.summary ?? `Last edited: ${new Date(doc?.created_at).toLocaleString()}`}
                             </div>
                           </div>
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            {new Date(doc.editedAt).toLocaleDateString()}
+                            {new Date(doc.created_at).toLocaleDateString()}
                           </div>
                         </Link>
                       </motion.li>
@@ -153,12 +156,12 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
             </div>
           )}
 
-          {!isLoading && hasResults && (
+          {!isLoading && results.length > 0 && (
             <ul className="">
               <AnimatePresence initial={false}>
-                {reports!.map((report) => (
+                {results.map((report) => (
                   <motion.li
-                    key={report.id}
+                    key={report._id}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
@@ -166,7 +169,7 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
                     className="my-2"
                   >
                     <Link
-                      href={`/dashboard/results/${report.id}`}
+                      href={`/dashboard/results/${report._id}`}
                       className="flex items-center gap-3 px-2 py-2 rounded-2xl hover:bg-accent/60 transition"
                       onClick={() => onClose(false)}
                     >
@@ -174,20 +177,11 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
                         <FileText className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium truncate">{report.name}</div>
+                        <div className="text-sm font-medium truncate">{report?.contract?.metadata?.name}</div>
                         <div className="text-xs text-muted-foreground truncate">
-                          {report.summary ?? `ID: ${report.id}`}
+                          {report?.result?.summary ?? `ID: ${report._id}`}
                         </div>
                       </div>
-                      {report.date && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground font-light ">
-                          
-                          {(() => {
-                            const d = new Date(report.date as string);
-                            return isNaN(d.getTime()) ? String(report.date) : d.toLocaleDateString();
-                          })()}
-                        </div>
-                      )}
                     </Link>
                   </motion.li>
                 ))}
@@ -195,7 +189,7 @@ export function SearchDialog({ isOpen, onClose }: { isOpen: boolean; onClose: (o
             </ul>
           )}
 
-          {!isLoading && !hasResults && !!query && (
+          {!isLoading && results && !!query && (
             <motion.div
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}

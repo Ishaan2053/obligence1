@@ -180,7 +180,7 @@ export function AppSidebar() {
               asChild
               className="flex items-center"
             >
-              <Link href="/dashboard/load">
+              <Link href="/dashboard/clarifications">
                 <HelpCircleIcon className="h-4 w-4" />
                 <span>Pre Assessment Clarifications</span>
               </Link>
@@ -360,7 +360,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
       {/* Search dialog */}
-      <SearchDialog isOpen={isSearchOpen} onClose={setIsSearchOpen} />
+      <SearchDialog isOpen={isSearchOpen} onClose={setIsSearchOpen} recentData={reports} />
     </Sidebar>
   );
 }
