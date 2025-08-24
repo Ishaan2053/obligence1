@@ -21,15 +21,27 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
+class Contracts(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id")
+    user: ObjectId
+    metadata: dict
+    file_url: str
+    status: str = "processing"
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = Field(default_factory=datetime.now)
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
 
 
 class ContractAnalysisJobModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id")
-    contract_id: str
-    user: str
+    contract_id: ObjectId
+    user: ObjectId
     status: str = "pending"  # pending, extracting, analyzing, done, failed
     error: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.now)
     updated_at: Optional[datetime] = None
 
     class Config:
@@ -37,12 +49,12 @@ class ContractAnalysisJobModel(BaseModel):
         allow_population_by_field_name = True
 
 
-
 class ContractAnalysisResultModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id")
-    contract_id: str
-    user: str
+    contract_id: ObjectId
+    user: ObjectId
     result: Dict
+    starred: bool = False
     created_at: datetime = Field(default_factory=datetime.now)
 
     class Config:
@@ -50,15 +62,14 @@ class ContractAnalysisResultModel(BaseModel):
         allow_population_by_field_name = True
 
 
-
 class ClarificationModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id")
-    contract_id: str
+    contract_id: ObjectId
     question: str
     response: Optional[str] = None
     status: str = "open"  # open, resolved
     priority: str = "medium"
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.now)
     resolved_at: Optional[datetime] = None
 
     class Config:

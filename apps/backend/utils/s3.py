@@ -1,6 +1,7 @@
 import boto3
 from fastapi import UploadFile
 from app.config import settings
+import datetime
 
 s3_client = boto3.client(
     "s3",
@@ -11,7 +12,12 @@ s3_client = boto3.client(
 
 async def upload_to_s3(file: UploadFile, user: str) -> str:
     """Uploads file to S3 and returns the file URL"""
-    key = f"{user}/{file.filename}"
+
+    # Take only the first 10 characters of the filename and remove spaces
+    base_filename = file.filename if len(file.filename) <= 10 else file.filename[:10]
+    base_filename = base_filename.replace(" ", "_")
+    base_filename = base_filename.replace(".pdf", "")  # Remove .pdf extension
+    key = f"{user}/{datetime.datetime.now().timestamp()}_{base_filename}.pdf"
     s3_client.upload_fileobj(file.file, settings.S3_BUCKET_NAME, key)
     file_url = f"https://{settings.S3_BUCKET_NAME}.s3.{settings.S3_REGION}.amazonaws.com/{key}"
     return file_url

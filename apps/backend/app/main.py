@@ -1,38 +1,51 @@
+import json
+import logging
+from datetime import datetime
+
 from fastapi import (
+    APIRouter,
+    BackgroundTasks,
     FastAPI,
     File,
     Form,
-    UploadFile,
-    APIRouter,
-    BackgroundTasks,
     HTTPException,
+    UploadFile,
+    Query,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from utils.s3 import upload_to_s3
-from utils.db import (
-    save_contract,
-    create_analysis_job,
-    update_analysis_job_status,
-    get_analysis_job_status,
-    save_analysis_result,
-    get_analysis_result,
-    resolve_clarification,
-    get_clarification,
-)
+
 from app.schemas import (
-    ContractUploadResponse,
-    ContractAnalysisStatusResponse,
-    ContractAnalysisResultResponse,
-    ClarificationResponse,
-    ClarificationListResponse,
     ClarificationListItem,
+    ClarificationListResponse,
+    ClarificationResponse,
+    ContractAnalysisResultResponse,
+    ContractAnalysisStatusResponse,
+    ContractUploadResponse,
 )
-from app.agent import portia_client
-import json
+from app.tools.analyze_job import analyze_contract_background
+from utils.db import (
+    create_analysis_job,
+    get_analysis_job_status,
+    get_analysis_result,
+    get_clarification,
+    get_clarifications,
+    resolve_clarification,
+    save_contract,
+    get_all_analysis_results,
+    star_analysis_result,
+    unstar_analysis_result,
+    get_starred_analysis_results,
+    delete_report,
+    fetch_report,
+)
+from utils.s3 import upload_to_s3
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Enhanced Contract Analysis Agent",
-    version="2.0.0",
+    version="1.0.0",
     description="AI-powered contract analysis using Portia AI and Google Gemini",
 )
 
@@ -51,6 +64,10 @@ app.add_middleware(
 router = APIRouter(prefix="/api")
 
 
+def _iso(v):
+    return v.isoformat() if isinstance(v, datetime) else v
+
+
 @router.post("/contracts/upload", response_model=ContractUploadResponse)
 async def upload_contract(
     file: UploadFile = File(...),
@@ -64,35 +81,11 @@ async def upload_contract(
     await create_analysis_job(contract_id, user)
     if background_tasks:
         background_tasks.add_task(
-            analyze_contract_background, contract_id, user, file, file_url
+            analyze_contract_background, contract_id, user, file_url
         )
     return ContractUploadResponse(
         file_url=file_url, contract_id=contract_id, status="processing"
     )
-
-
-async def analyze_contract_background(contract_id, user, file, file_url):
-    try:
-        await update_analysis_job_status(contract_id, "extracting")
-        file_bytes = await file.read()
-        pdf_result = portia_client.run_tool(
-            "pdf_reader", file_content=file_bytes, filename=file.filename
-        )
-        if not pdf_result or not pdf_result.get("success"):
-            await update_analysis_job_status(
-                contract_id, "failed", error="PDF extraction failed"
-            )
-            return
-        await update_analysis_job_status(contract_id, "analyzing")
-        analysis_result = portia_client.run_tool(
-            "comprehensive_contract_analyzer",
-            pdf_text=pdf_result["text"],
-            filename=file.filename,
-        )
-        await save_analysis_result(contract_id, user, analysis_result)
-        await update_analysis_job_status(contract_id, "done")
-    except Exception as e:
-        await update_analysis_job_status(contract_id, "failed", error=str(e))
 
 
 @router.get(
@@ -106,22 +99,126 @@ async def get_contract_status(contract_id: str):
         contract_id=contract_id,
         status=job.get("status", "unknown"),
         error=job.get("error"),
-        updated_at=job.get("updated_at"),
+        updated_at=_iso(job.get("updated_at")),
     )
 
 
 @router.get(
     "/contracts/result/{contract_id}", response_model=ContractAnalysisResultResponse
 )
-async def get_contract_result(contract_id: str):
-    result = await get_analysis_result(contract_id)
+async def get_contract_result(contract_id: str, userid: str):
+    result = await get_analysis_result(contract_id, userid)
     if not result:
         raise HTTPException(status_code=404, detail="Result not found")
     return ContractAnalysisResultResponse(
         contract_id=contract_id,
         result=result.get("result", {}),
-        created_at=result.get("created_at"),
+        created_at=_iso(result.get("created_at")),
     )
+
+
+@router.get("/contracts/result/all")
+async def get_all_contract_results(
+    userid: str = Query(...),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+):
+    """
+    Retrieve all contract results with pagination.
+
+    - **skip**: Number of results to skip (for pagination).
+    - **limit**: Maximum number of results to return (for pagination).
+    - **userid**: ID of the user requesting the results.
+    """
+    try:
+        results = await get_all_analysis_results(userid, skip, limit)
+    except Exception as error:
+        logger.error(f"Error retrieving contract results: {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    return {"results": results}
+
+
+@router.post("/contracts/result/star/{contract_id}")
+async def star_contract_result(contract_id: str, userid: str = Query(...)):
+    """
+    Star a contract analysis result for a user.
+
+    - **contract_id**: ID of the contract to star.
+    - **userid**: ID of the user starring the result.
+    """
+    try:
+        await star_analysis_result(contract_id, userid)
+        return {"message": "Contract result starred successfully"}
+    except Exception as error:
+        logger.error(f"Error starring contract result: {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.delete("/contracts/result/star/{contract_id}")
+async def unstar_contract_result(contract_id: str, userid: str = Query(...)):
+    """
+    Unstar a contract analysis result for a user.
+
+    - **contract_id**: ID of the contract to unstar.
+    - **userid**: ID of the user unstarring the result.
+    """
+    try:
+        await unstar_analysis_result(contract_id, userid)
+        return {"message": "Contract result unstarred successfully"}
+    except Exception as error:
+        logger.error(f"Error unstarring contract result: {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.get("/contracts/result/starred")
+async def get_starred_contract_results(userid: str = Query(...)):
+    """
+    Retrieve all starred contract results for a user.
+
+    - **userid**: ID of the user requesting the starred results.
+    """
+    try:
+        results = await get_starred_analysis_results(userid)
+        return {"results": results}
+    except Exception as error:
+        logger.error(f"Error retrieving starred contract results: {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.get("/contracts/report/{report_id}")
+async def get_report_by_id(report_id: str, userid: str = Query(...)):
+    """
+    Fetch a specific report by its ID for a user.
+
+    - **report_id**: ID of the report to fetch.
+    - **userid**: ID of the user requesting the report.
+    """
+    try:
+        report = await fetch_report(report_id, userid)
+        if not report:
+            raise HTTPException(status_code=404, detail="Report not found")
+        return {"report": report}
+    except HTTPException:
+        raise
+    except Exception as error:
+        logger.error(f"Error fetching report: {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.delete("/contracts/result/{contract_id}")
+async def delete_contract_result(contract_id: str, userid: str = Query(...)):
+    """
+    Delete a contract analysis result for a user.
+
+    - **contract_id**: ID of the contract result to delete.
+    - **userid**: ID of the user deleting the result.
+    """
+    try:
+        await delete_report(contract_id, userid)
+        return {"message": "Contract result deleted successfully"}
+    except Exception as error:
+        logger.error(f"Error deleting contract result: {error}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 # Clarification endpoints
@@ -132,20 +229,18 @@ async def get_clarifications_for_contract(contract_id: str):
     """
     Returns all clarifications raised by the Portia agent for a contract.
     """
-    from utils.db import get_clarifications_for_contract
-
-    clarifications = await get_clarifications_for_contract(contract_id)
+    clarifications = await get_clarifications(contract_id)
     result = []
-    for clar in clarifications:
+    for c in clarifications:
         result.append(
             ClarificationListItem(
-                id=str(clar.get("_id")),
-                question=clar.get("question"),
-                options=clar.get("options", []),
-                status=clar.get("status", "pending"),
-                priority=clar.get("priority", "medium"),
-                created_at=clar.get("created_at"),
-                resolved_at=clar.get("resolved_at"),
+                id=str(c.get("_id")),
+                question=c.get("question"),
+                options=c.get("options", []),
+                status=c.get("status", "pending"),
+                priority=c.get("priority", "medium"),
+                created_at=_iso(c.get("created_at")),
+                resolved_at=_iso(c.get("resolved_at")),
             )
         )
     return ClarificationListResponse(clarifications=result)
@@ -165,8 +260,8 @@ async def resolve_clarification_endpoint(clarification_id: str, response: str):
         response=clarification.get("response"),
         status=clarification["status"],
         priority=clarification["priority"],
-        created_at=clarification.get("created_at"),
-        resolved_at=clarification.get("resolved_at"),
+        created_at=_iso(clarification.get("created_at")),
+        resolved_at=_iso(clarification.get("resolved_at")),
     )
 
 
