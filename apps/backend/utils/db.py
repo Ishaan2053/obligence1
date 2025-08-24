@@ -215,4 +215,12 @@ async def fetch_report(report_id: str, user: str) -> dict:
     result = await analysis_results_collection.find_one(
         {"_id": ObjectId(report_id), "user": ObjectId(user)}
     )
+    contract_id = result["contract_id"]
+    result["contract_id"] = str(contract_id)
+    # Fetch the contract information
+    contract = await contracts_collection.find_one({"_id": contract_id})
+    if contract:
+        result["contract"] = serialize_document(contract)
+    else:
+        result["contract"] = None
     return serialize_document(result)

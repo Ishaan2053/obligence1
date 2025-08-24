@@ -34,7 +34,7 @@ function page() {
     )}&skip=0&limit=6&sort=desc`,
     fetcher
   );
-  const starred = data?.results ?? [];
+  const starred = starredData?.results ?? [];
 
   const formatRelative = (iso: string) => {
     try {
