@@ -11,6 +11,27 @@ analysis_results_collection = db["contract_analysis_results"]
 clarifications_collection = db["clarifications"]
 
 
+def serialize_document(doc):
+    """Convert ObjectId fields to strings for JSON serialization."""
+    if doc is None:
+        return None
+    if isinstance(doc, list):
+        return [serialize_document(item) for item in doc]
+    if isinstance(doc, dict):
+        serialized = {}
+        for key, value in doc.items():
+            if isinstance(value, ObjectId):
+                serialized[key] = str(value)
+            elif isinstance(value, dict):
+                serialized[key] = serialize_document(value)
+            elif isinstance(value, list):
+                serialized[key] = serialize_document(value)
+            else:
+                serialized[key] = value
+        return serialized
+    return doc
+
+
 async def save_contract(user: str, metadata: dict, file_url: str) -> str:
     user_id = ObjectId(user)
     now = datetime.now()
@@ -56,9 +77,10 @@ async def update_contract_status(contract_id: str, status: str):
 
 
 async def get_analysis_job_status(contract_id: str):
-    return await analysis_jobs_collection.find_one(
+    result = await analysis_jobs_collection.find_one(
         {"contract_id": ObjectId(contract_id)}
     )
+    return serialize_document(result)
 
 
 async def save_analysis_result(contract_id: str, user: str, result: dict):
@@ -72,9 +94,10 @@ async def save_analysis_result(contract_id: str, user: str, result: dict):
 
 
 async def get_analysis_result(contract_id: str, userid: str):
-    return await analysis_results_collection.find_one(
+    result = await analysis_results_collection.find_one(
         {"contract_id": ObjectId(contract_id), "user": ObjectId(userid)}
     )
+    return serialize_document(result)
 
 
 async def get_all_analysis_results(
@@ -85,7 +108,8 @@ async def get_all_analysis_results(
         .skip(skip)
         .limit(limit)
     )
-    return await cursor.to_list(length=limit)
+    results = await cursor.to_list(length=limit)
+    return serialize_document(results)
 
 
 async def create_clarification(
@@ -122,14 +146,16 @@ async def get_clarifications(contract_id: str) -> list:
     Get all clarifications for a given contract_id.
     """
     cursor = clarifications_collection.find({"contract_id": ObjectId(contract_id)})
-    return await cursor.to_list(length=100)
+    results = await cursor.to_list(length=100)
+    return serialize_document(results)
 
 
 async def get_clarification(clarification_id: str) -> dict:
     """
     Get a single clarification by its ID.
     """
-    return await clarifications_collection.find_one({"_id": ObjectId(clarification_id)})
+    result = await clarifications_collection.find_one({"_id": ObjectId(clarification_id)})
+    return serialize_document(result)
 
 
 async def star_analysis_result(contract_id: str, user: str):
@@ -148,7 +174,8 @@ async def unstar_analysis_result(contract_id: str, user: str):
 
 async def get_starred_analysis_results(user: str) -> list:
     cursor = analysis_results_collection.find({"user": ObjectId(user), "starred": True})
-    return await cursor.to_list(length=100)
+    results = await cursor.to_list(length=100)
+    return serialize_document(results)
 
 
 async def delete_report(contract_id: str, user: str):
@@ -158,6 +185,7 @@ async def delete_report(contract_id: str, user: str):
 
 
 async def fetch_report(report_id: str, user: str) -> dict:
-    return await analysis_results_collection.find_one(
+    result = await analysis_results_collection.find_one(
         {"_id": ObjectId(report_id), "user": ObjectId(user)}
     )
+    return serialize_document(result)
