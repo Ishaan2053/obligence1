@@ -9,7 +9,7 @@ function buildBackendUrl(contractId: string, userId: string) {
 	)}?userid=${encodeURIComponent(userId)}`;
 }
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ contract_id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ contract_id: string }> }) {
 	try {
 		if (!BACKEND_URL) {
 			return NextResponse.json({ error: "Backend URL not configured" }, { status: 500 });
