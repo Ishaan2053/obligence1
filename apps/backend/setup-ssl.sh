@@ -28,22 +28,22 @@ warning() {
     echo -e "${YELLOW}[WARNING] $1${NC}"
 }
 
-# Check if domain resolves correctly
-check_domain() {
-    log "Checking domain resolution..."
+# # Check if domain resolves correctly
+# check_domain() {
+#     log "Checking domain resolution..."
     
-    DOMAIN_IP=$(dig +short $DOMAIN)
-    SERVER_IP=$(curl -s https://ipinfo.io/ip)
+#     DOMAIN_IP=$(dig +short $DOMAIN)
+#     SERVER_IP=$(curl -s https://ipinfo.io/ip)
     
-    echo "Domain $DOMAIN resolves to: $DOMAIN_IP"
-    echo "This server IP: $SERVER_IP"
+#     echo "Domain $DOMAIN resolves to: $DOMAIN_IP"
+#     echo "This server IP: $SERVER_IP"
     
-    if [ "$DOMAIN_IP" != "$SERVER_IP" ]; then
-        error "Domain does not resolve to this server. Please update DNS records first."
-    fi
+#     if [ "$DOMAIN_IP" != "$SERVER_IP" ]; then
+#         error "Domain does not resolve to this server. Please update DNS records first."
+#     fi
     
-    log "✅ Domain resolution verified"
-}
+#     log "✅ Domain resolution verified"
+# }
 
 # Setup SSL certificate
 setup_ssl() {
