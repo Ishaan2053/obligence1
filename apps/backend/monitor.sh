@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-DOMAIN="agent.kyrexi.tech"
+DOMAIN="alfa.kyrexi.tech"
 PROJECT_DIR="/opt/obligence-backend"
 
 # Colors

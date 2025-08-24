@@ -5,7 +5,7 @@
 
 set -e
 
-DOMAIN="agent.kyrexi.tech"
+DOMAIN="alfa.kyrexi.tech"
 EMAIL="tripathipranav14@gmail.com" 
 
 # Colors
@@ -84,7 +84,7 @@ setup_ssl() {
     
     # Switch to HTTPS configuration
     log "Switching to HTTPS configuration..."
-    sudo cp nginx/conf.d/agent.kyrexi.tech.conf nginx/conf.d/default.conf
+    sudo cp nginx/conf.d/alfa.kyrexi.tech.conf nginx/conf.d/default.conf
 
     # Restart nginx
     sudo docker compose restart nginx
