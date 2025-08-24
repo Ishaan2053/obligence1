@@ -110,6 +110,17 @@ async def get_all_analysis_results(
         .sort("created_at", 1 if sort == "asc" else -1)
     )
     results = await cursor.to_list(length=limit)
+    # Then populate the contract with the contract_id
+    for item in results:
+        contract_id = item["contract_id"]
+        item["contract_id"] = str(contract_id)
+        
+        # Fetch the contract information
+        contract = await contracts_collection.find_one({"_id": contract_id})
+        if contract:
+            item["contract"] = serialize_document(contract)
+        else:
+            item["contract"] = None
     return serialize_document(results)
 
 
@@ -155,7 +166,9 @@ async def get_clarification(clarification_id: str) -> dict:
     """
     Get a single clarification by its ID.
     """
-    result = await clarifications_collection.find_one({"_id": ObjectId(clarification_id)})
+    result = await clarifications_collection.find_one(
+        {"_id": ObjectId(clarification_id)}
+    )
     return serialize_document(result)
 
 
