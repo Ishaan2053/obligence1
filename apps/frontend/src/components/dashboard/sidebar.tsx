@@ -11,6 +11,7 @@ import {
   useSidebar,
   SidebarSeparator,
   SidebarGroupLabel,
+  SidebarMenuAction,
 } from "@/components/ui/sidebar";
 import {
   BarChart2,
@@ -26,6 +27,7 @@ import {
   ShredderIcon,
   HelpCircleIcon,
   Search,
+  MoreHorizontalIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -166,9 +168,24 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="flex items-center" isActive={active}>
                       <Link href={href}>
                         <NotepadText className="h-4 w-4" />
-                        <span>{report.name}</span>
+                        <span className="font-light">{report.name}</span>
                       </Link>
                     </SidebarMenuButton>
+                    <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <SidebarMenuAction>
+        <MoreHorizontalIcon />
+      </SidebarMenuAction>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent side="right" align="start">
+      <DropdownMenuItem>
+        <span>Star</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <span>Delete Report</span>
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
                   </SidebarMenuItem>
                 );
               })}
