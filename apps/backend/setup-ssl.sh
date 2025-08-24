@@ -104,7 +104,7 @@ setup_ssl() {
 
 main() {
     
-    check_domain
+    # check_domain
     setup_ssl
     
     log "🎉 SSL setup completed!"
