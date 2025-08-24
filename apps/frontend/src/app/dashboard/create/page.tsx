@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ import { LockIcon } from "lucide-react";
 type Props = {};
 
 function Page({}: Props) {
+  const router = useRouter();
   type Template = {
     id: string;
     name: string;
@@ -114,11 +116,21 @@ const templates: Template[] = [
       });
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
       const data = await res.json();
-      // Provide minimal success feedback
+      // Try to extract a contract id from various shapes
+      const toId = (v: any) => (typeof v === "string" ? v : v && typeof v === "object" && "$oid" in v ? String(v.$oid) : undefined);
+      const contractId =
+        toId(data?.contract_id) ||
+        toId(data?._id) ||
+        toId(data?.id) ||
+        toId(data?.data?.contract_id) ||
+        toId(data?.data?._id);
+
       setSubmitMessage("Uploaded successfully.");
-      // Optional: reset form
-      // setName(""); setDescription(""); setTag("none"); setFile(null); setSelectedId(null); setStep(1);
-      console.log("Dummy API response:", data);
+      console.log("Upload API response:", data);
+
+      if (contractId) {
+        router.push(`/dashboard/processing/${encodeURIComponent(contractId)}`);
+      }
     } catch (err: any) {
       console.error(err);
       setSubmitMessage("Submission failed. Please try again.");
