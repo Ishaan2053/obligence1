@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { LuGithub } from "react-icons/lu";
+import { AnimatePresence, motion } from "framer-motion";
 
 type TabKey = "profile" | "connected" | "danger";
 type OAuthProvider = "google" | "github";
@@ -121,14 +122,16 @@ export default function SettingsDialog() {
 		icon: React.ComponentType<any>;
 	}) => (
 		<SidebarMenuItem>
-			<SidebarMenuButton
-				isActive={activeTab === tab}
-				onClick={() => setActiveTab(tab)}
-				className="flex items-center rounded-2xl"
-			>
-				<Icon className="h-4 w-4" />
-				<span>{label}</span>
-			</SidebarMenuButton>
+			<motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+				<SidebarMenuButton
+					isActive={activeTab === tab}
+					onClick={() => setActiveTab(tab)}
+					className="flex items-center rounded-2xl"
+				>
+					<Icon className="h-4 w-4" />
+					<span>{label}</span>
+				</SidebarMenuButton>
+			</motion.div>
 		</SidebarMenuItem>
 	);
 
@@ -167,8 +170,16 @@ export default function SettingsDialog() {
 
 						{/* Right content */}
 						<div className="flex-1 overflow-auto p-6 space-y-8">
-							{activeTab === "profile" && (
-								<section className="space-y-6">
+							<AnimatePresence mode="wait" initial={false}>
+								{activeTab === "profile" && (
+									<motion.section
+										key="profile"
+										initial={{ opacity: 0, x: 24 }}
+										animate={{ opacity: 1, x: 0 }}
+										exit={{ opacity: 0, x: -24 }}
+										transition={{ duration: 0.22, ease: "easeOut" }}
+										className="space-y-6"
+									>
 									<header>
 										<h3 className="text-base font-semibold">Profile</h3>
 										<p className="text-sm text-muted-foreground">
@@ -198,14 +209,23 @@ export default function SettingsDialog() {
 											/>
 										</div>
 										<DialogFooter>
-											<Button type="submit">Save changes</Button>
+											<motion.div whileTap={{ scale: 0.98 }}>
+												<Button type="submit">Save changes</Button>
+											</motion.div>
 										</DialogFooter>
 									</form>
-								</section>
+								</motion.section>
 							)}
 
 							{activeTab === "connected" && (
-								<section className="space-y-6">
+								<motion.section
+									key="connected"
+									initial={{ opacity: 0, x: 24 }}
+									animate={{ opacity: 1, x: 0 }}
+									exit={{ opacity: 0, x: -24 }}
+									transition={{ duration: 0.22, ease: "easeOut" }}
+									className="space-y-6"
+								>
 									<header className="space-y-1">
 										<h3 className="text-base font-semibold">Connected Accounts</h3>
 										<p className="text-sm text-muted-foreground">
@@ -217,9 +237,15 @@ export default function SettingsDialog() {
 										{(["google", "github"] as OAuthProvider[]).map((provider) => {
 											const connected = accounts?.some((a) => a.provider === provider);
 											return (
-												<div
+												<motion.div
 													key={provider}
 													className="flex items-center justify-between rounded-2xl border p-4"
+													initial={{ opacity: 0, y: 6 }}
+													animate={{ opacity: 1, y: 0 }}
+													exit={{ opacity: 0, y: -6 }}
+													transition={{ duration: 0.18, ease: "easeOut" }}
+													whileHover={{ y: -2 }}
+													whileTap={{ scale: 0.98 }}
 												>
 													<div className="flex items-center gap-3">
 														<div
@@ -238,23 +264,27 @@ export default function SettingsDialog() {
 													</div>
 													<div className="flex items-center gap-2">
 														{connected ? (
-															<Button
+															<motion.div whileTap={{ scale: 0.98 }}>
+																<Button
 																variant="secondary"
 																onClick={() => handleUnlink(provider)}
 																disabled={loadingAccounts}
-															>
-																Disconnect
-															</Button>
+																>
+																	Disconnect
+																</Button>
+															</motion.div>
 														) : (
-															<Button
+															<motion.div whileTap={{ scale: 0.98 }}>
+																<Button
 																onClick={() => signInClient(provider, { redirect: true })}
 																disabled={loadingAccounts}
-															>
-																Connect
-															</Button>
+																>
+																	Connect
+																</Button>
+															</motion.div>
 														)}
 													</div>
-												</div>
+												</motion.div>
 											);
 										})}
 									</div>
@@ -262,11 +292,18 @@ export default function SettingsDialog() {
 									{loadingAccounts && (
 										<p className="text-xs text-muted-foreground">Loading connections…</p>
 									)}
-								</section>
+							</motion.section>
 							)}
 
 							{activeTab === "danger" && (
-								<section className="space-y-6">
+								<motion.section
+									key="danger"
+									initial={{ opacity: 0, x: 24 }}
+									animate={{ opacity: 1, x: 0 }}
+									exit={{ opacity: 0, x: -24 }}
+									transition={{ duration: 0.22, ease: "easeOut" }}
+									className="space-y-6"
+								>
 									<header>
 										<h3 className="text-base font-semibold">Danger Zone</h3>
 										<p className="text-sm text-muted-foreground">
@@ -280,13 +317,16 @@ export default function SettingsDialog() {
 											</p>
 										</div>
 										<DialogFooter>
-											<Button type="submit" variant="destructive">
-												<Trash2 className="mr-2 h-4 w-4" /> Delete account
-											</Button>
+											<motion.div whileTap={{ scale: 0.98 }}>
+												<Button type="submit" variant="destructive">
+													<Trash2 className="mr-2 h-4 w-4" /> Delete account
+												</Button>
+											</motion.div>
 										</DialogFooter>
 									</form>
-								</section>
+								</motion.section>
 							)}
+							</AnimatePresence>
 
 						
 

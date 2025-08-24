@@ -79,8 +79,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
       async jwt({ token, user }) {
         if (user) {
           const extendedUser = user as ExtendedUser;
-          token._id = extendedUser._id ? String(extendedUser._id) : "";
-          token.image = extendedUser.image || "";
+          // Prefer _id from credentials flow, else adapter's user.id, else existing sub
+          const idFromUser = (extendedUser as any)._id ?? (user as any).id;
+          token._id = idFromUser ? String(idFromUser) : token._id || token.sub || "";
+          token.image = extendedUser.image || (user as any).image || token.image || "";
+        }
+        // Ensure _id is set on subsequent JWT callbacks
+        if (!token._id && token.sub) {
+          token._id = token.sub;
         }
         return token;
       },
@@ -89,6 +95,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
           session.user._id = token._id || "";
           session.user.image = token.image || "";
         }
+        console.log (session);
         return session;
       },
     },
