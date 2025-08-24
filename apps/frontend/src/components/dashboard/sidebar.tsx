@@ -62,16 +62,77 @@ export function AppSidebar() {
     email?: string | null;
   };
 
-  type Report = { id: string; name: string };
+  type Contract = {
+    _id: string;
+    user: string;
+    metadata: {
+      name: string;
+    };
+    file_url: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+  };
+
+  type Result = {
+    summary?: string;
+    parties?: Array<{
+      name?: string;
+      role?: string;
+      contact_info?: string | null;
+    }>;
+    dates?: {
+      effective_date?: string | null;
+      termination_date?: string | null;
+      renewal_date?: string | null;
+      signature_date?: string | null;
+    };
+    obligations?: Array<{
+      party?: string;
+      text?: string;
+      deadline?: string | null;
+      category?: string;
+    }>;
+    financial_terms?: Array<{
+      amount?: string;
+      currency?: string;
+      frequency?: string;
+      description?: string;
+    }>;
+    risk_assessment?: {
+      risk_level?: string;
+      risk_factors?: string[];
+      recommendations?: string[];
+    };
+    confidence_score?: number;
+    unclear_sections?: Array<{
+      section?: string;
+      issue?: string;
+      priority?: string;
+    }>;
+  };
+
+  type Report = {
+    _id: string;
+    contract_id: string;
+    user: string;
+    result: Result;
+    created_at: string;
+    starred?: boolean;
+    contract: Contract;
+  };
+
   const fetcher = (url: string) => fetch(url).then((r) => {
     if (!r.ok) throw new Error(`Failed ${r.status}`);
     return r.json();
   });
-  const { data: reportsData, isLoading: reportsLoading, error: reportsError } = useSWR<{ reports: Report[] }>(
-    "/api/reports",
-   fetcher
+  const { data: reportsData, isLoading: reportsLoading, error: reportsError } = useSWR<{ results: Report[] }>(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contracts/results/all?userid=${encodeURIComponent(
+      session?.user?._id || ""
+    )}&skip=0&limit=100&sort=desc`,
+    fetcher
   );
-  const reports = reportsData?.reports ?? [];
+  const reports = reportsData?.results ?? [];
 
   const starReport = async (contractId: string) => {
     if (!contractId || starringId) return;
@@ -137,7 +198,7 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent className="px-2 overflow-hidden">
-        <SidebarSeparator className=""/>
+        <SidebarSeparator className="" />
         <SidebarMenu className="globalScroll">
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -170,8 +231,8 @@ export function AppSidebar() {
               onClick={() => setIsSearchOpen(true)}
               className="flex items-center"
             >
-                <Search className="h-4 w-4" />
-                <span>Search Reports</span>
+              <Search className="h-4 w-4" />
+              <span>Search Reports</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarGroupLabel>All Reports</SidebarGroupLabel>
@@ -201,48 +262,48 @@ export function AppSidebar() {
           {!reportsLoading && !reportsError && reports.length > 0 && (
             <>
               {reports.map((report) => {
-                const href = `/dashboard/results/${report.id}`;
-                const active = pathname.startsWith("/dashboard/results/") && pathname.includes(report.id);
+                const href = `/dashboard/results/${report._id}`;
+                const active = pathname.startsWith("/dashboard/results/") && pathname.includes(report._id);
                 return (
-                  <SidebarMenuItem key={report.id}>
+                  <SidebarMenuItem key={report._id}>
                     <SidebarMenuButton asChild className="flex items-center" isActive={active}>
                       <Link href={href}>
                         <NotepadText className="h-4 w-4" />
-                        <span className="font-light">{report.name}</span>
+                        <span className="font-light">{report?.contract?.metadata?.name}</span>
                       </Link>
                     </SidebarMenuButton>
                     <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <SidebarMenuAction>
-        <MoreHorizontalIcon />
-      </SidebarMenuAction>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent side="right" align="start">
-      <DropdownMenuItem
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          starReport(report.id);
-        }}
-        disabled={starringId === report.id}
-      >
-        <span>{starringId === report.id ? "Starring…" : "Star"}</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          unstarReport(report.id);
-        }}
-        disabled={starringId === report.id}
-      >
-        <span>{starringId === report.id ? "Unstarring…" : "Unstar"}</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem>
-        <span>Delete Report</span>
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuAction>
+                          <MoreHorizontalIcon />
+                        </SidebarMenuAction>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            starReport(report._id);
+                          }}
+                          disabled={starringId === report._id}
+                        >
+                          <span>{starringId === report._id ? "Starring…" : "Star"}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            unstarReport(report._id);
+                          }}
+                          disabled={starringId === report._id}
+                        >
+                          <span>{starringId === report._id ? "Unstarring…" : "Unstar"}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <span>Delete Report</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </SidebarMenuItem>
                 );
               })}
@@ -259,12 +320,11 @@ export function AppSidebar() {
                 toggleSidebar();
                 setIsSidebarOpen(!isSidebarOpen);
               }}
-              // className="flex items-center justify-center w-full"
+            // className="flex items-center justify-center w-full"
             >
               <ChevronsLeft
-                className={`h-4 w-4 ${
-                  isSidebarOpen ? "" : "transform rotate-180"
-                } transition-transform duration-300`}
+                className={`h-4 w-4 ${isSidebarOpen ? "" : "transform rotate-180"
+                  } transition-transform duration-300`}
               />
               <span>Collapse Sidebar</span>
             </SidebarMenuButton>
@@ -297,13 +357,13 @@ export function AppSidebar() {
               <DropdownMenuContent className="w-full p-0 rounded-2xl" align="end">
                 <DropdownMenuLabel className="flex gap-2 items-center">
                   <div>
-                  <Avatar className="h-6 w-6 ml-1">
-                    <AvatarImage src={user?.image ?? undefined} alt={user?.name || ""} />
-                    <AvatarFallback>
-                      {/* Use first letter of name or a fallback icon */}
-                      {(user?.name?.charAt(0) || "U").toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                    <Avatar className="h-6 w-6 ml-1">
+                      <AvatarImage src={user?.image ?? undefined} alt={user?.name || ""} />
+                      <AvatarFallback>
+                        {/* Use first letter of name or a fallback icon */}
+                        {(user?.name?.charAt(0) || "U").toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   <div className="flex min-w-0 flex-col text-left">
                     <span className="truncate">{user?.name || "Account"}</span>
@@ -312,7 +372,7 @@ export function AppSidebar() {
                     )}
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <SettingsDialog />
                 </DropdownMenuItem>
@@ -333,8 +393,8 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-  {/* Search dialog */}
-  <SearchDialog isOpen={isSearchOpen} onClose={setIsSearchOpen} />
+      {/* Search dialog */}
+      <SearchDialog isOpen={isSearchOpen} onClose={setIsSearchOpen} />
     </Sidebar>
   );
 }
