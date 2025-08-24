@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type React from "react";
 import {
 	Dialog,
@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { signIn as signInClient } from "next-auth/react";
 import {
 	User,
 	Mail,
@@ -33,8 +34,16 @@ import {
 	Settings,
     AlertTriangleIcon,
 } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { LuGithub } from "react-icons/lu";
 
 type TabKey = "profile" | "connected" | "danger";
+type OAuthProvider = "google" | "github";
+
+type AccountDoc = {
+	provider: OAuthProvider | string;
+	providerAccountId: string;
+};
 
 export default function SettingsDialog() {
 	const [open, setOpen] = useState(false);
@@ -45,9 +54,8 @@ export default function SettingsDialog() {
 	const [email, setEmail] = useState("");
 
 	// Password state
-	const [currentPassword, setCurrentPassword] = useState("");
-	const [newPassword, setNewPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
+	const [accounts, setAccounts] = useState<AccountDoc[]>([]);
+	const [loadingAccounts, setLoadingAccounts] = useState(false);
 
 	const handleSaveProfile = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -56,15 +64,40 @@ export default function SettingsDialog() {
 		setOpen(false);
 	};
 
-	const handleChangePassword = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (newPassword !== confirmPassword) {
-			alert("New password and confirmation do not match.");
-			return;
+	const refreshAccounts = async () => {
+		try {
+			setLoadingAccounts(true);
+			const res = await fetch("/api/accounts", { cache: "no-store" });
+			if (!res.ok) throw new Error("Failed to load accounts");
+			const data = await res.json();
+			setAccounts(data.accounts || []);
+		} catch (err) {
+			console.error(err);
+		} finally {
+			setLoadingAccounts(false);
 		}
-		// Replace with API call
-		console.log("Change password", { currentPassword, newPassword });
-		setOpen(false);
+	};
+
+	useEffect(() => {
+		if (open && activeTab === "connected") {
+			refreshAccounts();
+		}
+	}, [open, activeTab]);
+
+	const handleUnlink = async (provider: OAuthProvider) => {
+		try {
+			const res = await fetch("/api/accounts/unlink", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ provider }),
+			});
+			if (!res.ok) throw new Error("Failed to unlink account");
+			await refreshAccounts();
+			alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} account disconnected`);
+		} catch (err) {
+			console.error(err);
+			alert("Unable to disconnect account.");
+		}
 	};
 
 	const handleDeleteAccount = (e: React.FormEvent) => {
@@ -173,47 +206,62 @@ export default function SettingsDialog() {
 
 							{activeTab === "connected" && (
 								<section className="space-y-6">
-									<header>
+									<header className="space-y-1">
 										<h3 className="text-base font-semibold">Connected Accounts</h3>
 										<p className="text-sm text-muted-foreground">
-											Manage your connected accounts and their permissions.
+											Link or unlink your Google and GitHub accounts.
 										</p>
 									</header>
-									<form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
-										<div className="grid gap-2">
-											<Label htmlFor="currentPassword">Current password</Label>
-											<Input
-												id="currentPassword"
-												type="password"
-												value={currentPassword}
-												onChange={(e) => setCurrentPassword(e.target.value)}
-												required
-											/>
-										</div>
-										<div className="grid gap-2">
-											<Label htmlFor="newPassword">New password</Label>
-											<Input
-												id="newPassword"
-												type="password"
-												value={newPassword}
-												onChange={(e) => setNewPassword(e.target.value)}
-												required
-											/>
-										</div>
-										<div className="grid gap-2">
-											<Label htmlFor="confirmPassword">Confirm new password</Label>
-											<Input
-												id="confirmPassword"
-												type="password"
-												value={confirmPassword}
-												onChange={(e) => setConfirmPassword(e.target.value)}
-												required
-											/>
-										</div>
-										<DialogFooter>
-											<Button type="submit">Update password</Button>
-										</DialogFooter>
-									</form>
+
+									<div className="grid gap-4 max-w-2xl">
+										{(["google", "github"] as OAuthProvider[]).map((provider) => {
+											const connected = accounts?.some((a) => a.provider === provider);
+											return (
+												<div
+													key={provider}
+													className="flex items-center justify-between rounded-2xl border p-4"
+												>
+													<div className="flex items-center gap-3">
+														<div
+															className="h-9 w-9 rounded-full border flex items-center justify-center bg-muted"
+														>
+															<span className="text-xs font-medium">
+																{provider === "google" ? <FcGoogle/> : <LuGithub/>}
+															</span>
+														</div>
+														<div>
+															<p className="text-sm font-medium capitalize">{provider}</p>
+															<p className="text-xs text-muted-foreground">
+																{connected ? "Connected" : "Not connected"}
+															</p>
+														</div>
+													</div>
+													<div className="flex items-center gap-2">
+														{connected ? (
+															<Button
+																variant="secondary"
+																onClick={() => handleUnlink(provider)}
+																disabled={loadingAccounts}
+															>
+																Disconnect
+															</Button>
+														) : (
+															<Button
+																onClick={() => signInClient(provider, { redirect: true })}
+																disabled={loadingAccounts}
+															>
+																Connect
+															</Button>
+														)}
+													</div>
+												</div>
+											);
+										})}
+									</div>
+
+									{loadingAccounts && (
+										<p className="text-xs text-muted-foreground">Loading connections…</p>
+									)}
 								</section>
 							)}
 
