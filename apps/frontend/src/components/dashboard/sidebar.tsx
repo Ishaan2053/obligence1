@@ -172,6 +172,23 @@ export function AppSidebar() {
     setStarringId(null);
   };
 
+  const deleteReport = async (contractId: string) => {
+    if (!contractId) return;
+    await toast.promise(
+      fetch(`/api/contracts/result/${encodeURIComponent(contractId)}`, {
+        method: "DELETE",
+      }).then((res) => {
+        if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
+        return res;
+      }),
+      {
+        loading: "Deleting report…",
+        success: "Report deleted",
+        error: (err) => err?.message || "Failed to delete report",
+      }
+    );
+  };
+
   return (
     <Sidebar collapsible="icon" className="">
       <SidebarHeader>
@@ -299,8 +316,14 @@ export function AppSidebar() {
                         >
                           <span>{starringId === report._id ? "Unstarring…" : "Unstar"}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <span>Delete Report</span>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            deleteReport(report._id);
+                          }}
+                        >
+                          <span>{"Delete Report"}</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
