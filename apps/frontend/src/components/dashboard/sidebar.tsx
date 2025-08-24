@@ -96,7 +96,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent className="px-2 overflow-hidden">
         <SidebarSeparator className=""/>
-        <SidebarMenu className="">
+        <SidebarMenu className="globalScroll">
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Create New Document"
