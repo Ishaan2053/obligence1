@@ -1,0 +1,71 @@
+# Git
+.git
+.gitignore
+README.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables (security)
+.env
+.env.local
+.env.production
+.env.staging
+
+# Development tools
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Portia cache (development artifacts)
+.portia/
+
+# Testing
+tests/
+test_*.py
+*_test.py
+
+# Documentation
+docs/
+*.md

@@ -265,4 +265,10 @@ async def resolve_clarification_endpoint(clarification_id: str, response: str):
     )
 
 
+# Health check endpoint for Docker
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
+
 app.include_router(router)
