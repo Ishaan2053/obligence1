@@ -29,10 +29,6 @@ RUN pip install --upgrade pip && \
 # Copy application code
 COPY app/ ./app/
 COPY utils/ ./utils/
-COPY start.sh ./start.sh
-
-# Make startup script executable
-RUN chmod +x /app/start.sh
 
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser && \
@@ -47,5 +43,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Run the app
-CMD ["./start.sh"]
+# Run the app directly with uvicorn (fixed port and workers)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--log-level", "INFO", "--access-log", "--loop", "uvloop", "--http", "httptools"]
