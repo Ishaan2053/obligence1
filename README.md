@@ -1,5 +1,5 @@
 # Obligence: AI-Powered Contract Intelligence Platform
-![Obligence](/apps/frontend/public/landing.png)
+![Obligence](apps/frontend/public/landing.png)
 > Seamlessly extract, analyze, and gain insights from contracts using Portia AI.  
 > **Monorepo: Next.js 15.5 (Frontend) & FastAPI + Portia SDK (Backend)**  
 >  
@@ -24,9 +24,11 @@
 
 ## 🧠 Technical Process Overview
 
+![Technical Process flowchart](apps/frontend/public/idea.png)
+
 ### 1. Contract Upload & Ingestion
 
-*Users upload a PDF through the Next.js frontend.*  
+*Users upload a PDF through the Next.js frontend.*
 - React dropzone for upload
 - Immediate feedback on format, size, duplicates
 
@@ -36,9 +38,9 @@
 - Saves incoming file & metadata
 - Kicks off Portia agent with `PDFReader` and legal extraction plan
 - Portia parses text, runs custom clause prompts, structures results:
-    - **Extracted:** `parties`, `dates`, `obligations`, `clauses`, risk triggers
-- **If ambiguity:**  
-  - Portia’s planners flag for human input, pausing flow until legal review/response is given (stored to DB, resumes on resolve)
+  - **Extracted:** `parties`, `dates`, `obligations`, `clauses`, risk triggers
+  - **If ambiguity:**  
+    Portia’s planners flag for human input, pausing flow until legal review/response is given (stored to DB, resumes on resolve)
 - Stores final structured data + trace for full auditability
 
 ### 3. Results Presentation & Dashboard (Frontend)
@@ -46,17 +48,18 @@
 - Fetches extraction summaries and traces via REST API
 - Dynamic table and PDF viewer with highlight overlays
 - Real-time updates via long-poll for background jobs
-- User can review, submit clarifications and download data as PDF or JSON
+- User can review and download data as PDF or JSON
 
 ---
 
 ## 🖼️ Architecture & Demo
-![Architecture Flowchart](/apps/frontend/public/Flowchart.png)
+
+![Architecture Flowchart](apps/frontend/public/Flowchart.png)
 
 ## 🌟 User Flow
 
 1. **Sign Up / Log In**  
-   Fast, secure onboarding with multiple account linking  .
+   Fast, secure onboarding with multiple account linking.
 2. **Document Upload**  
    Drag-and-drop or browse, status bar feedback.
 3. **Background Extraction**  
@@ -80,15 +83,22 @@
 - Portia API SDK key (sign up at [Portia Labs](https://portialabs.ai))
 
 ### 1. Clone the Monorepo
-```git clone https://github.com/yourusername/obligence.git
-cd obligence```
+
+```bash
+git clone https://github.com/yourusername/obligence.git
+cd obligence
+```
 
 ### 2. Set Up Infrastructure
-```docker-compose up -d```
+
+```bash
+docker-compose up -d
+```
 
 ### 3. Backend (FastAPI + Portia)
-```
-cd packages/backend
+
+```bash
+cd apps/backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -98,25 +108,27 @@ uvicorn app.main:app --reload
 ```
 
 ### 4. Frontend (Next.js)
-```
-cd packages/frontend
+
+```bash
+cd apps/frontend
 pnpm install
 cp .env.local.example .env.local # Set NEXT_PUBLIC_API_URL
 pnpm dev
-
 ```
-- Access the frontend at [localhost:3000](http://localhost:3000)
-- API is served at [localhost:8000](http://localhost:8000)
+
+- Access the frontend at [http://localhost:3000](http://localhost:3000)
+- API is served at [http://localhost:8000](http://localhost:8000)
 
 ---
 
 ## 📦 Repo Structure
 
+```
 obligence/
 ├── apps/
-│ ├── backend/ # FastAPI + Portia SDK agent logic & API
-│ └── frontend/ # Next.js 14, React, all UI/UX assets
+│   ├── backend/    # FastAPI + Portia SDK agent logic & API
+│   └── frontend/   # Next.js 14, React, all UI/UX assets
 ├── infrastructure/ # Docker, scripts, infra-as-code
 └── README.md
-
-Made by Ishaan and Pranav Tripathi during AgentHack 2025
+```
+⭐ Made by [Ishaan](https://github.com/ishaan2053) and [Pranav Tripathi](http://github.com/prnvtripathi) during AgentHack 2025 ⭐
