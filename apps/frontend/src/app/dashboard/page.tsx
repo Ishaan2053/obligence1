@@ -7,22 +7,34 @@ import { FilePlus, Sheet } from "lucide-react";
 import GlowingCards, { GlowingCard } from "@/components/dashboard/glowing-cards";
 import useSWR from "swr";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-type Props = {};
+import { Report } from "@/types/report.type";
+import Link from "next/link"
 
-function page({}: Props) {
+function page() {
   const { data: session } = useSession();
   const user = session?.user;
 
-  type RecentDoc = { id: string; title: string; editedAt: string };
   const fetcher = (url: string) => fetch(url).then((r) => {
     if (!r.ok) throw new Error(`Failed ${r.status}`);
     return r.json();
   });
-  const { data, error, isLoading } = useSWR<{ documents: RecentDoc[] }>(
-    "/api/recent-documents",
+  // recent posts
+  const { data, error, isLoading } = useSWR<{ results: Report[] }>(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contracts/results/all?userid=${encodeURIComponent(
+      user?._id || ""
+    )}&skip=0&limit=6&sort=desc`,
     fetcher
   );
-  const recent = data?.documents ?? [];
+  const recent = data?.results ?? [];
+
+  // starred posts
+  const { data: starredData, error: starredError, isLoading: starredLoading } = useSWR<{ results: Report[] }>(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contracts/result/starred?userid=${encodeURIComponent(
+      user?._id || ""
+    )}&skip=0&limit=6&sort=desc`,
+    fetcher
+  );
+  const starred = data?.results ?? [];
 
   const formatRelative = (iso: string) => {
     try {
@@ -70,7 +82,7 @@ function page({}: Props) {
           padding="0"
           borderRadius="1rem"
           className="mt-2"
-       >
+        >
           {(() => {
             type Card = {
               title: string;
@@ -80,7 +92,7 @@ function page({}: Props) {
               iconNode?: React.ReactNode;
             };
             const cards: Card[] = [
-              { title: "New Document", link: "/document1", icon: FilePlus, glowColor: "#737373" },
+              { title: "New Document", link: "/dashboard/create", icon: FilePlus, glowColor: "#737373" },
               {
                 title: "Document 2",
                 link: "/document2",
@@ -98,30 +110,30 @@ function page({}: Props) {
             ];
             return cards.map((document, i) => {
               const Icon = (document.icon ?? Sheet) as React.ElementType;
-            return (
-              <GlowingCard
-                key={i}
-                glowColor={document.glowColor as string}
-                className="group cursor-pointer select-none flex items-center justify-center min-h-32 md:min-h-48"
-              >
-                <motion.a
-                  href={document.link}
-                  whileHover={{ y: -4 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
-                  className="flex flex-col items-center outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring"
+              return (
+                <GlowingCard
+                  key={i}
+                  glowColor={document.glowColor as string}
+                  className="group cursor-pointer select-none flex items-center justify-center min-h-32 md:min-h-48"
                 >
-                  <motion.span>
+                  <motion.a
+                    href={document.link}
+                    whileHover={{ y: -4 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.6 }}
+                    className="flex flex-col items-center outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:border-ring"
+                  >
+                    <motion.span>
                       {document.iconNode ? (
                         document.iconNode
                       ) : (
                         <Icon className=" group-hover:rotate-6 transition-all text-foreground h-10 w-10 md:h-20 md:w-20" />
                       )}
-                  </motion.span>
-                  <h3 className="mt-2 text-xs text-foreground md:text-base text-center font-semibold">{document.title}</h3>
-                </motion.a>
-              </GlowingCard>
-            );
+                    </motion.span>
+                    <h3 className="mt-2 text-xs text-foreground md:text-base text-center font-semibold">{document.title}</h3>
+                  </motion.a>
+                </GlowingCard>
+              );
             });
           })()}
         </GlowingCards>
@@ -129,7 +141,7 @@ function page({}: Props) {
       <Separator className="my-6" />
 
       <motion.section
-        className="flex md:flex"
+        className="flex md:flex-row flex-col"
         initial={{ opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -24 }}
@@ -148,30 +160,73 @@ function page({}: Props) {
               <p className="text-sm text-muted-foreground">No recent documents.</p>
             )}
             {recent.map((doc) => (
-              <motion.div
-                key={doc.id}
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.99 }}
-                transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.6 }}
-                className="cursor-pointer flex items-center gap-2 text-sm text-muted-foreground w-fit rounded-full px-4 py-2 hover:bg-accent/30"
+              <Link
+                key={doc._id}
+                href={`/dashboard/results/${doc._id}`}
               >
-                <motion.span whileHover={{ rotate: 3 }} className="inline-flex">
-                  <Sheet className="text-foreground rounded-full h-8 w-8" />
-                </motion.span>
-                <div className="flex flex-col">
-                  <h4 className="font-semibold text-foreground">{doc.title}</h4>
-                  <p className="text-xs text-muted-foreground italic">
-                    Edited {formatRelative(doc.editedAt)}
-                  </p>
-                </div>
-              </motion.div>
+                <motion.div
+                  key={doc._id}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.99 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.6 }}
+                  className="cursor-pointer flex items-center gap-2 text-sm text-muted-foreground w-fit rounded-full px-4 py-2 hover:bg-accent/30"
+                >
+                  <motion.span whileHover={{ rotate: 3 }} className="inline-flex">
+                    <Sheet className="text-foreground rounded-full h-8 w-8" />
+                  </motion.span>
+                  <div className="flex flex-col">
+                    <h4 className="font-semibold text-foreground">{doc?.contract?.metadata?.name}</h4>
+                    <p className="text-xs text-muted-foreground italic">
+                      Edited {formatRelative(doc?.created_at)}
+                    </p>
+                  </div>
+                </motion.div>
+              </Link>
+
             ))}
           </div>{" "}
         </div>
 
-        <div className="w-1/2">
-         <h2 className="font-semibold text-2xl">Starred Reports</h2></div>
-  </motion.section>
+        <div className="w-full md:w-1/2 space-y-6">
+          <h2 className="font-semibold text-2xl">Starred Reports</h2>
+          <div className="space-y-4">
+            {starredLoading && (
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            )}
+            {starredError && (
+              <p className="text-sm text-destructive">Failed to load starred documents.</p>
+            )}
+            {!starredLoading && !starredError && starred.length === 0 && (
+              <p className="text-sm text-muted-foreground">No starred documents.</p>
+            )}
+            {starred.map((doc) => (
+              <Link
+                key={doc._id}
+                href={`/dashboard/results/${doc._id}`}
+              >
+                <motion.div
+                  key={doc._id}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.99 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.6 }}
+                  className="cursor-pointer flex items-center gap-2 text-sm text-muted-foreground w-fit rounded-full px-4 py-2 hover:bg-accent/30"
+                >
+                  <motion.span whileHover={{ rotate: 3 }} className="inline-flex">
+                    <Sheet className="text-foreground rounded-full h-8 w-8" />
+                  </motion.span>
+                  <div className="flex flex-col">
+                    <h4 className="font-semibold text-foreground">{doc?.contract?.metadata?.name}</h4>
+                    <p className="text-xs text-muted-foreground italic">
+                      Edited {formatRelative(doc?.created_at)}
+                    </p>
+                  </div>
+                </motion.div>
+              </Link>
+
+            ))}
+          </div>
+        </div>
+      </motion.section>
     </div>
   );
 }
