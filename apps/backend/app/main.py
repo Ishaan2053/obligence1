@@ -88,36 +88,7 @@ async def upload_contract(
     )
 
 
-@router.get(
-    "/contracts/status/{contract_id}", response_model=ContractAnalysisStatusResponse
-)
-async def get_contract_status(contract_id: str):
-    job = await get_analysis_job_status(contract_id)
-    if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return ContractAnalysisStatusResponse(
-        contract_id=contract_id,
-        status=job.get("status", "unknown"),
-        error=job.get("error"),
-        updated_at=_iso(job.get("updated_at")),
-    )
-
-
-@router.get(
-    "/contracts/result/{contract_id}", response_model=ContractAnalysisResultResponse
-)
-async def get_contract_result(contract_id: str, userid: str):
-    result = await get_analysis_result(contract_id, userid)
-    if not result:
-        raise HTTPException(status_code=404, detail="Result not found")
-    return ContractAnalysisResultResponse(
-        contract_id=contract_id,
-        result=result.get("result", {}),
-        created_at=_iso(result.get("created_at")),
-    )
-
-
-@router.get("/contracts/result/all")
+@router.get("/contracts/results/all")
 async def get_all_contract_results(
     userid: str = Query(...),
     skip: int = Query(0, ge=0),
@@ -269,6 +240,35 @@ async def resolve_clarification_endpoint(clarification_id: str, response: str):
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
+
+@router.get(
+    "/contracts/status/{contract_id}", response_model=ContractAnalysisStatusResponse
+)
+async def get_contract_status(contract_id: str):
+    job = await get_analysis_job_status(contract_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return ContractAnalysisStatusResponse(
+        contract_id=contract_id,
+        status=job.get("status", "unknown"),
+        error=job.get("error"),
+        updated_at=_iso(job.get("updated_at")),
+    )
+
+
+@router.get(
+    "/contracts/result/{contract_id}", response_model=ContractAnalysisResultResponse
+)
+async def get_contract_result(contract_id: str, userid: str):
+    result = await get_analysis_result(contract_id, userid)
+    if not result:
+        raise HTTPException(status_code=404, detail="Result not found")
+    return ContractAnalysisResultResponse(
+        contract_id=contract_id,
+        result=result.get("result", {}),
+        created_at=_iso(result.get("created_at")),
+    )
 
 
 app.include_router(router)
