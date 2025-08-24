@@ -25,6 +25,7 @@ import {
   Cog,
   ShredderIcon,
   HelpCircleIcon,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -43,9 +44,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
+import { SearchDialog } from "./search";
 
 export function AppSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -118,6 +121,15 @@ export function AppSidebar() {
                 <HelpCircleIcon className="h-4 w-4" />
                 <span>Pre Assessment Clarifications</span>
               </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem> <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="Search Reports"
+              onClick={() => setIsSearchOpen(true)}
+              className="flex items-center"
+            >
+                <Search className="h-4 w-4" />
+                <span>Search Reports</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarGroupLabel>All Reports</SidebarGroupLabel>
@@ -247,6 +259,8 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+  {/* Search dialog */}
+  <SearchDialog isOpen={isSearchOpen} onClose={setIsSearchOpen} />
     </Sidebar>
   );
 }
