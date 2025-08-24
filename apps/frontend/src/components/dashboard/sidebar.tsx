@@ -222,8 +222,8 @@ export function AppSidebar() {
           {!reportsLoading && !reportsError && reports.length > 0 && (
             <>
               {reports.map((report) => {
-                const href = `/dashboard/results/${report._id}`;
-                const active = pathname.startsWith("/dashboard/results/") && pathname.includes(report._id);
+                const href = `/dashboard/results/${report?.contract_id}`;
+                const active = pathname.startsWith("/dashboard/results/") && pathname.includes(report?.contract_id);
                 return (
                   <SidebarMenuItem key={report._id}>
                     <SidebarMenuButton asChild className="flex items-center" isActive={active}>

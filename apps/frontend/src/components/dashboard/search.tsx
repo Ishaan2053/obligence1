@@ -13,8 +13,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Report } from "@/types/report.type";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 export function SearchDialog({ isOpen, onClose, recentData }: { isOpen: boolean; onClose: (open: boolean) => void; recentData: Report[] }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
@@ -120,7 +118,7 @@ export function SearchDialog({ isOpen, onClose, recentData }: { isOpen: boolean;
                         className="my-2"
                       >
                         <Link
-                          href={`/dashboard/results/${doc._id}`}
+                          href={`/dashboard/results/${doc.contract_id}`}
                           className="flex items-center gap-3 px-2 py-2 rounded-2xl hover:bg-accent/60 transition"
                           onClick={() => onClose(false)}
                         >

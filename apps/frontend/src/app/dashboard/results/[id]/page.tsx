@@ -118,8 +118,8 @@ const fetchContract = async (_key: string, contractId: string): Promise<Contract
     parties,
     dates,
     obligations,
-  clarifications,
-  unclearSections: (r.unclear_sections || []).map((u) => ({ section: u.section, issue: u.issue, priority: u.priority })),
+    clarifications,
+    unclearSections: (r.unclear_sections || []).map((u) => ({ section: u.section, issue: u.issue, priority: u.priority })),
   }
   return vm
 }
@@ -207,10 +207,10 @@ function ReportView({ data }: { data: ContractReport }) {
     // Create PDF and embed image
     const pdf = await PDFDocument.create()
     // Use A4 portrait by default scaled to content
-  const A4_WIDTH = 595.28 // pt
-  const A4_HEIGHT = 841.89 // pt
-  const marginX = 36 // 0.5in horizontal padding
-  const marginY = 36 // 0.5in vertical padding
+    const A4_WIDTH = 595.28 // pt
+    const A4_HEIGHT = 841.89 // pt
+    const marginX = 36 // 0.5in horizontal padding
+    const marginY = 36 // 0.5in vertical padding
 
     // Load image
     const pngBytes = await fetch(dataUrl).then(r => r.arrayBuffer())
@@ -247,11 +247,11 @@ function ReportView({ data }: { data: ContractReport }) {
       })
     }
 
-  const pdfBytes = await pdf.save()
-  // Create a concrete ArrayBuffer (avoids ArrayBufferLike/SharedArrayBuffer union issues)
-  const copy = new Uint8Array(pdfBytes.length)
-  copy.set(pdfBytes)
-  const blob = new Blob([copy.buffer], { type: 'application/pdf' })
+    const pdfBytes = await pdf.save()
+    // Create a concrete ArrayBuffer (avoids ArrayBufferLike/SharedArrayBuffer union issues)
+    const copy = new Uint8Array(pdfBytes.length)
+    copy.set(pdfBytes)
+    const blob = new Blob([copy.buffer], { type: 'application/pdf' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -376,7 +376,7 @@ function ReportView({ data }: { data: ContractReport }) {
             <CardTitle className="text-xl">Highlights & Drill‑down</CardTitle>
             <CardDescription>Important clauses surfaced first</CardDescription>
           </CardHeader>
-        
+
           <CardContent className="mt-4 grid gap-6 md:grid-cols-2">
             <div className="space-y-3">
               <h3 className="text-sm font-medium">Key clauses</h3>
