@@ -36,7 +36,8 @@
 - Saves incoming file & metadata
 - Kicks off Portia agent with `PDFReader` and legal extraction plan
 - Portia parses text, runs custom clause prompts, structures results:
-    - **Extracted:** `parties`, `dates`, `obligations`, `clauses`, risk triggers
+    - **Extracted:** `parties`, `dates`, `obligations`, `clauses`, risk triggers    
+    
 - **If ambiguity:**  
   - Portia’s planners flag for human input, pausing flow until legal review/response is given (stored to DB, resumes on resolve)
 - Stores final structured data + trace for full auditability
