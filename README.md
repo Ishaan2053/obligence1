@@ -54,7 +54,11 @@
 
 ## 🖼️ Architecture & Demo
 
+- Core Architecture workflow: -
 ![Architecture Flowchart](apps/frontend/public/Flowchart.png)
+
+- Portia Plan builder workflow: -
+![Portia Plan Builder Flowchart](apps/frontend/public/portia.png)
 
 ## 🌟 User Flow
 
