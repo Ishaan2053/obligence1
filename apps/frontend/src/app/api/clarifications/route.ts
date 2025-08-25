@@ -1,69 +1,116 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { auth } from "@/auth"
 
-// Mock data for clarifications across contracts
-// Shape chosen to match the Clarifications page needs
-// ContractEntry: { id, title, created_at, clarifications: Clarification[] }
-// Clarification: { id, question, options, status, created_at }
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
-export async function GET() {
-  const contracts = [
-    {
-      id: "contract-a",
-      title: "MSA - Acme Corp",
-      created_at: "2025-08-18T09:00:00Z",
-      clarifications: [
-        {
-          id: "clar123",
-          question: "Which effective date should we use?",
-          options: ["2024-01-01", "2024-02-01"],
-          status: "pending",
-          created_at: "2025-08-20T10:00:00Z",
-        },
-        {
-          id: "clar124",
-          question: "Confirm governing law?",
-          options: ["Delaware", "California"],
-          status: "resolved",
-          created_at: "2025-08-19T08:30:00Z",
-        },
-      ],
-    },
-    {
-      id: "contract-b",
-      title: "NDA - Globex",
-      created_at: "2025-08-10T14:32:00Z",
-      clarifications: [
-        {
-          id: "clar200",
-          question: "Disclosure period length?",
-          options: ["1 year", "2 years"],
-          status: "pending",
-          created_at: "2025-08-21T11:00:00Z",
-        },
-      ],
-    },
-    {
-      id: "contract-c",
-      title: "SOW - Initech",
-      created_at: "2025-08-05T12:00:00Z",
-      clarifications: [
-        {
-          id: "clar300",
-          question: "Payment terms confirmation?",
-          options: ["Net 30", "Net 45", "Advance"],
-          status: "pending",
-          created_at: "2025-08-22T09:15:00Z",
-        },
-        {
-          id: "clar301",
-          question: "Delivery milestone dates?",
-          options: ["Q3", "Q4"],
-          status: "pending",
-          created_at: "2025-08-23T16:20:00Z",
-        },
-      ],
-    },
-  ]
+type ClarificationNorm = {
+  id: string
+  question: string
+  options: string[]
+  status: string
+  created_at: string
+  contract_id: string
+  contract_title: string
+  contract_created_at?: string
+}
 
-  return NextResponse.json({ contracts })
+function coerceClarification(item: any): ClarificationNorm | null {
+  if (!item) return null
+  const id = item.id ?? item.clarification_id ?? item._id
+  const question = item.question ?? item.text ?? item.prompt
+  const options = Array.isArray(item.options)
+    ? item.options
+    : Array.isArray(item.choices)
+      ? item.choices
+      : []
+  const status = item.status ?? (item.resolved ? "resolved" : "pending")
+  const created_at = item.created_at ?? item.createdAt ?? item.timestamp ?? new Date().toISOString()
+
+  const contract = item.contract ?? {}
+  const contract_id = contract.id ?? item.contract_id ?? item.contractId ?? "unknown"
+  const contract_title = contract.title ?? item.contract_title ?? item.contractName ?? "Unknown Contract"
+  const contract_created_at = contract.created_at ?? contract.createdAt ?? item.contract_created_at ?? item.contractCreatedAt
+
+  if (!id || !question) return null
+  return {
+    id: String(id),
+    question: String(question),
+    options: options.map((o: any) => String(o)),
+    status: String(status),
+    created_at: String(created_at),
+    contract_id: String(contract_id),
+    contract_title: String(contract_title),
+    contract_created_at: contract_created_at ? String(contract_created_at) : undefined,
+  }
+}
+
+function normalizeToContracts(body: any) {
+  if (body && Array.isArray(body.contracts)) {
+    // Already in desired shape
+    return { contracts: body.contracts }
+  }
+
+  const rawItems: any[] = Array.isArray(body)
+    ? body
+    : Array.isArray(body?.clarifications)
+      ? body.clarifications
+      : []
+
+  const items: ClarificationNorm[] = rawItems
+    .map(coerceClarification)
+    .filter((x): x is ClarificationNorm => !!x)
+
+  const map = new Map<string, { id: string; title: string; created_at: string; clarifications: any[] }>()
+  for (const it of items) {
+    if (!map.has(it.contract_id)) {
+      map.set(it.contract_id, {
+        id: it.contract_id,
+        title: it.contract_title,
+        created_at: it.contract_created_at ?? new Date().toISOString(),
+        clarifications: [],
+      })
+    }
+    const group = map.get(it.contract_id)!
+    group.clarifications.push({
+      id: it.id,
+      question: it.question,
+      options: it.options,
+      status: it.status,
+      created_at: it.created_at,
+    })
+  }
+
+  return { contracts: Array.from(map.values()) }
+}
+
+export async function GET(_req: NextRequest) {
+  try {
+    if (!BACKEND_URL) {
+      return NextResponse.json({ error: "Backend URL not configured" }, { status: 500 })
+    }
+
+    const session = await auth()
+    if (!session?.user?._id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const url = `${BACKEND_URL}/api/clarifications/all?user=${encodeURIComponent(session.user._id)}`
+    const res = await fetch(url, { method: "GET" })
+    const contentType = res.headers.get("content-type") || ""
+    const body = contentType.includes("application/json") ? await res.json() : await res.text()
+
+    if (!contentType.includes("application/json")) {
+      // Pass through non-JSON
+      return new NextResponse(typeof body === "string" ? body : String(body), {
+        status: res.status,
+        headers: { "content-type": "text/plain" },
+      })
+    }
+
+    const normalized = normalizeToContracts(body)
+    return NextResponse.json(normalized, { status: res.status })
+  } catch (err) {
+    console.error("GET /api/clarifications error", err)
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+  }
 }

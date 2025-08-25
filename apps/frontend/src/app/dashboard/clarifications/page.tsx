@@ -73,8 +73,29 @@ export default function Page() {
 
   // Keep per-question choices
   const [choices, setChoices] = React.useState<Record<string, string | undefined>>({})
+  const [submitting, setSubmitting] = React.useState<Record<string, boolean>>({})
   const setChoice = (qid: string, value?: string) =>
     setChoices((prev) => ({ ...prev, [qid]: value }))
+
+  const { mutate } = useSWR<{ contracts: ContractEntry[] }>("/api/clarifications")
+
+  async function submitAnswer(clarId: string) {
+    const value = choices[clarId]
+    if (!value) return
+    try {
+      setSubmitting((s) => ({ ...s, [clarId]: true }))
+      const res = await fetch(`/api/clarifications/resolve/${encodeURIComponent(clarId)}?response=${encodeURIComponent(value)}`, {
+        method: "POST",
+      })
+      if (!res.ok) throw new Error("Failed to submit answer")
+      // Refresh clarifications list
+      await mutate()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSubmitting((s) => ({ ...s, [clarId]: false }))
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -279,7 +300,9 @@ export default function Page() {
                                     ))}
                                   </RadioGroup>
                                   <div className="pt-1">
-                                    <Button size="sm" disabled={!choices[q.id]}>Submit answer</Button>
+                                    <Button size="sm" disabled={!choices[q.id] || submitting[q.id]} onClick={() => submitAnswer(q.id)}>
+                                      {submitting[q.id] ? "Submitting…" : "Submit answer"}
+                                    </Button>
                                   </div>
                                 </CardContent>
                               </Card>
