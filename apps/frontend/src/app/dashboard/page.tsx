@@ -94,8 +94,8 @@ function page() {
             const cards: Card[] = [
               { title: "New Document", link: "/dashboard/create", icon: FilePlus, glowColor: "#737373" },
               {
-                title: "Document 2",
-                link: "/document2",
+                title: "Clarifications",
+                link: "/dashboard/clarifications",
                 glowColor: "#f97316",
                 iconNode: (
                   <DotLottieReact
@@ -106,7 +106,7 @@ function page() {
                   />
                 ),
               },
-              { title: "Document 3", link: "/document3", icon: Sheet, glowColor: "#737373" },
+              { title: "Search Reports", link: "/", icon: Sheet, glowColor: "#737373" },
             ];
             return cards.map((document, i) => {
               const Icon = (document.icon ?? Sheet) as React.ElementType;

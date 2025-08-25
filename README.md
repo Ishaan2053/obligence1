@@ -54,11 +54,14 @@
 
 ## 🖼️ Architecture & Demo
 
-- Core Architecture workflow: -
+### Core Architecture workflow: -
 ![Architecture Flowchart](apps/frontend/public/Flowchart.png)
 
-- Portia Plan builder workflow: -
+### Portia Plan builder workflow: -
 ![Portia Plan Builder Flowchart](apps/frontend/public/portia.png)
+
+### YouTube Demo Video
+![Obligence Demo YouTube Video](https://youtu.be/j9vwxsSxA6Y)
 
 ## 🌟 User Flow
 
