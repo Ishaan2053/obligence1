@@ -55,6 +55,8 @@ async def create_analysis_job(contract_id: str, user: str) -> str:
         "error": None,
         "created_at": datetime.now(),
         "updated_at": None,
+        # Track Portia plan run id to support resume after clarifications
+        "plan_run_id": None,
     }
     result = await analysis_jobs_collection.insert_one(job)
     return str(result.inserted_id)
@@ -66,6 +68,14 @@ async def update_analysis_job_status(contract_id: str, status: str, error: str =
         update["error"] = error
     await analysis_jobs_collection.update_one(
         {"contract_id": ObjectId(contract_id)}, {"$set": update}
+    )
+
+
+async def set_analysis_job_plan_run_id(contract_id: str, plan_run_id: str):
+    """Persist the Portia plan run id on the job for later resume."""
+    await analysis_jobs_collection.update_one(
+        {"contract_id": ObjectId(contract_id)},
+        {"$set": {"plan_run_id": plan_run_id, "updated_at": datetime.now()}},
     )
 
 
@@ -125,7 +135,16 @@ async def get_all_analysis_results(
 
 
 async def create_clarification(
-    contract_id: str, question: str, priority: str = "medium"
+    contract_id: str,
+    question: str,
+    priority: str = "medium",
+    *,
+    options: list | None = None,
+    category: str | None = None,
+    portia_plan_run_id: str | None = None,
+    portia_clarification_id: str | None = None,
+    step: int | None = None,
+    argument_name: str | None = None,
 ) -> str:
     clarification = {
         "contract_id": ObjectId(contract_id),
@@ -135,6 +154,13 @@ async def create_clarification(
         "created_at": datetime.now(),
         "resolved_at": None,
         "response": None,
+        # Optional fields for richer MCQ clarifications
+        "options": options or [],
+        "category": category,
+        "portia_plan_run_id": portia_plan_run_id,
+        "portia_clarification_id": portia_clarification_id,
+        "step": step,
+        "argument_name": argument_name,
     }
     result = await clarifications_collection.insert_one(clarification)
     return str(result.inserted_id)

@@ -30,6 +30,8 @@ plan = (
         task=analyze_prompt,
         inputs=[StepOutput(0)],
     )
+    # If Portia or tools raise clarifications (e.g., Multiple Choice),
+    # the plan run will pause and our background job will persist them.
     .final_output(
         output_schema=FinalOutput,
     )

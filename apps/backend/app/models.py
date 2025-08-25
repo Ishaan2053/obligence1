@@ -39,6 +39,7 @@ class ContractAnalysisJobModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id")
     contract_id: ObjectId
     user: ObjectId
+    plan_id: Optional[str] = None
     status: str = "pending"  # pending, extracting, analyzing, done, failed
     error: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.now)
@@ -71,6 +72,14 @@ class ClarificationModel(BaseModel):
     priority: str = "medium"
     created_at: datetime = Field(default_factory=datetime.now)
     resolved_at: Optional[datetime] = None
+    # Optional parameters for richer mcq clarification
+    options: Optional[list[str]] = None
+    answer: Optional[str] = None
+    category: Optional[str] = None
+    portia_plan_run_id: Optional[str] = None
+    portia_clarification_id: Optional[str] = None
+    step: Optional[int] = None
+    argument_name: Optional[str] = None
 
     class Config:
         json_encoders = {ObjectId: str}
