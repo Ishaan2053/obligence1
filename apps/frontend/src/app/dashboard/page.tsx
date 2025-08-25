@@ -106,7 +106,7 @@ function page() {
                   />
                 ),
               },
-              { title: "Search Reports", link: "/", icon: Sheet, glowColor: "#737373" },
+              // { title: "Search Reports", link: "/", icon: Sheet, glowColor: "#737373" },
             ];
             return cards.map((document, i) => {
               const Icon = (document.icon ?? Sheet) as React.ElementType;

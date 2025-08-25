@@ -15,6 +15,12 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Clock, CheckCircle2, HelpCircle, FileText } from "lucide-react"
+import useSWR from "swr"
+
+const fetcher = (url: string) => fetch(url).then((res) => {
+  if (!res.ok) throw new Error("Failed to load clarifications")
+  return res.json()
+})
 
 type Clarification = {
   id: string
@@ -46,48 +52,20 @@ function formatDate(iso: string) {
 }
 
 export default function Page() {
-  // Example data; replace with real data from your API/source
-  const [contracts] = React.useState<ContractEntry[]>([
-    {
-      id: "contract-a",
-      title: "MSA - Acme Corp",
-      created_at: "2025-08-18T09:00:00Z",
-      clarifications: [
-        {
-          id: "clar123",
-          question: "Which effective date should we use?",
-          options: ["2024-01-01", "2024-02-01"],
-          status: "pending",
-          created_at: "2025-08-20T10:00:00Z",
-        },
-        {
-          id: "clar124",
-          question: "Confirm governing law?",
-          options: ["Delaware", "California"],
-          status: "resolved",
-          created_at: "2025-08-19T08:30:00Z",
-        },
-      ],
-    },
-    {
-      id: "contract-b",
-      title: "NDA - Globex",
-      created_at: "2025-08-10T14:32:00Z",
-      clarifications: [
-        {
-          id: "clar200",
-          question: "Disclosure period length?",
-          options: ["1 year", "2 years"],
-          status: "pending",
-          created_at: "2025-08-21T11:00:00Z",
-        },
-      ],
-    },
-  ])
-
-  const [selectedContractId, setSelectedContractId] = React.useState<string | null>(
-    contracts[0]?.id ?? null
+  // Fetch contracts and clarifications via API with SWR
+  const { data, isLoading, error } = useSWR<{ contracts: ContractEntry[] }>(
+    "/api/clarifications",
+    fetcher,
+    { revalidateOnFocus: false }
   )
+  const contracts: ContractEntry[] = data?.contracts ?? []
+
+  const [selectedContractId, setSelectedContractId] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    if (!selectedContractId && contracts.length > 0) {
+      setSelectedContractId(contracts[0].id)
+    }
+  }, [contracts, selectedContractId])
   const selectedContract = contracts.find((c) => c.id === selectedContractId) || null
   const pendingQuestions = (selectedContract?.clarifications || []).filter(
     (q) => q.status === "pending"
@@ -112,7 +90,19 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left: contract entries */}
           <div className="md:col-span-1 space-y-3">
-            {contracts.length === 0 ? (
+            {isLoading ? (
+              <Card className="rounded-2xl bg-transparent">
+                <CardContent className="py-10 text-center text-muted-foreground">
+                  Loading contracts…
+                </CardContent>
+              </Card>
+            ) : error ? (
+              <Card className="rounded-2xl bg-transparent">
+                <CardContent className="py-10 text-center text-destructive">
+                  Failed to load clarifications.
+                </CardContent>
+              </Card>
+            ) : contracts.length === 0 ? (
               <Card className="rounded-2xl bg-transparent">
                 <CardContent className="py-10 text-center text-muted-foreground">
                   No contracts found.
@@ -187,7 +177,33 @@ export default function Page() {
           <div className="md:col-span-2">
             <Card className="min-h-[16rem] rounded-2xl bg-transparent h-full">
               <AnimatePresence mode="wait" initial={false}>
-                {selectedContract ? (
+                {isLoading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="h-64"
+                  >
+                    <CardContent className="h-full flex items-center justify-center text-muted-foreground">
+                      Loading clarifications…
+                    </CardContent>
+                  </motion.div>
+                ) : error ? (
+                  <motion.div
+                    key="error"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="h-64"
+                  >
+                    <CardContent className="h-full flex items-center justify-center text-destructive">
+                      Failed to load clarifications.
+                    </CardContent>
+                  </motion.div>
+                ) : selectedContract ? (
                   <motion.div
                     key={selectedContract.id}
                     initial={{ opacity: 0, y: 6 }}
