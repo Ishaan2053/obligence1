@@ -162,7 +162,7 @@ function page() {
             {recent.map((doc) => (
               <Link
                 key={doc._id}
-                href={`/dashboard/results/${doc._id}`}
+                href={`/dashboard/results/${doc.contract_id}`}
               >
                 <motion.div
                   key={doc._id}
@@ -202,7 +202,7 @@ function page() {
             {starred.map((doc) => (
               <Link
                 key={doc._id}
-                href={`/dashboard/results/${doc._id}`}
+                href={`/dashboard/results/${doc.contract_id}`}
               >
                 <motion.div
                   key={doc._id}
