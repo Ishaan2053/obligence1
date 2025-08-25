@@ -8,6 +8,8 @@ from utils.db import (
     update_analysis_job_status,
     save_analysis_result,
     update_contract_status,
+    create_clarification,
+    set_analysis_job_plan_run_id,
 )
 from app.agent import portia_config, complete_tool_registry
 from pydantic import BaseModel
@@ -42,6 +44,55 @@ async def analyze_contract_background(contract_id, user, file_url):
         run = await portia.run_builder_plan(
             plan, plan_run_inputs={"pdf_file": temp_file_path}, end_user=end_user
         )
+
+        # Persist plan_run_id on the job for potential resume
+        try:
+            await set_analysis_job_plan_run_id(contract_id, getattr(run, "id", None))
+        except Exception:
+            pass
+
+        # Handle Portia clarifications if any were raised
+        if run.state == PlanRunState.NEED_CLARIFICATION:
+            logger.info("Plan run requires clarification(s). Persisting and pausing job.")
+            try:
+                # Collect and persist all outstanding clarifications
+                outstanding = run.get_outstanding_clarifications()
+                for c in outstanding:
+                    try:
+                        question = getattr(c, "user_guidance", None) or "Additional input required"
+                        options = getattr(c, "options", None) or []
+                        category = getattr(c, "category", None) or c.__class__.__name__
+                        step = getattr(c, "step", None)
+                        argument_name = (
+                            getattr(c, "argument_name", None)
+                            if hasattr(c, "argument_name")
+                            else getattr(c, "argument", None)
+                        )
+                        clar_uuid = getattr(c, "uuid", None) or getattr(c, "id", None)
+                        plan_run_id = getattr(run, "id", None)
+                        await create_clarification(
+                            contract_id,
+                            question=question,
+                            priority="high",
+                            options=options,
+                            category=category,
+                            portia_plan_run_id=plan_run_id,
+                            portia_clarification_id=clar_uuid,
+                            step=step,
+                            argument_name=argument_name,
+                        )
+                    except Exception as ce:
+                        logger.error(f"Failed to persist clarification: {ce}")
+                # Mark job/contract as awaiting clarification and return
+                await update_analysis_job_status(contract_id, "needs_clarification")
+                await update_contract_status(contract_id, "needs_clarification")
+                return
+            except Exception as e:
+                # If persisting fails, mark as failed
+                await update_analysis_job_status(contract_id, "failed", error=str(e))
+                await update_contract_status(contract_id, "failed")
+                logger.error(f"Error handling clarifications: {e}")
+                return
 
         if run.state != PlanRunState.COMPLETE:
             raise Exception(
