@@ -26,6 +26,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ cont
 		}
 
 		const url = buildBackendUrl(contract_id, session.user._id);
+		console.log("Fetching contract result from URL:", url);
 		const res = await fetch(url, { method: "GET" });
 		const contentType = res.headers.get("content-type") || "";
 		const body = contentType.includes("application/json") ? await res.json() : await res.text();
