@@ -61,7 +61,7 @@
 ![Portia Plan Builder Flowchart](apps/frontend/public/portia.png)
 
 ### YouTube Demo Video
-![Obligence Demo YouTube Video](https://youtu.be/j9vwxsSxA6Y)
+[Obligence Demo Video](https://youtu.be/j9vwxsSxA6Y)
 
 ## 🌟 User Flow
 
