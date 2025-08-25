@@ -30,13 +30,20 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ co
     const res = await fetch(url, { method: "POST" });
     const contentType = res.headers.get("content-type") || "";
     const body = contentType.includes("application/json") ? await res.json() : await res.text();
+
+    console.log("Response from backend:", {
+      status: res.status,
+      contentType,
+      body,
+    });
+
     return new NextResponse(
       typeof body === "string" ? body : JSON.stringify(body),
       {
-        status: res.status,
-        headers: {
-          "content-type": contentType.includes("application/json") ? "application/json" : "text/plain",
-        },
+      status: res.status,
+      headers: {
+        "content-type": contentType.includes("application/json") ? "application/json" : "text/plain",
+      },
       }
     );
   } catch (err) {
