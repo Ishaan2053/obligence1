@@ -98,6 +98,14 @@ class ClarificationListItem(BaseModel):
     priority: str = "medium"
     created_at: Optional[str] = None
     resolved_at: Optional[str] = None
+    # Optional Params for more rich clarifications
+    options: Optional[list[str]] = None
+    answer: Optional[str] = None
+    category: Optional[str] = None
+    portia_plan_run_id: Optional[str] = None
+    portia_clarification_id: Optional[str] = None
+    step: Optional[int] = None
+    argument_name: Optional[str] = None
 
 
 class ClarificationListResponse(BaseModel):

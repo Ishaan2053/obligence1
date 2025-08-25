@@ -37,6 +37,7 @@ from utils.db import (
     get_starred_analysis_results,
     delete_report,
     fetch_report,
+    get_all_clarifications,
 )
 from utils.s3 import upload_to_s3
 
@@ -93,7 +94,7 @@ async def get_all_contract_results(
     userid: str = Query(...),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
-    sort: str = Query("asc", enum=["asc", "desc"])
+    sort: str = Query("asc", enum=["asc", "desc"]),
 ):
     """
     Retrieve all contract results with pagination.
@@ -270,6 +271,25 @@ async def get_contract_result(contract_id: str, userid: str):
         result=result.get("result", {}),
         created_at=_iso(result.get("created_at")),
     )
+
+
+@router.get("/clarifications/all", response_model=ClarificationListResponse)
+async def get_all_clarifications_endpoint(user: str):
+    clarifications = await get_all_clarifications(user)
+    result = []
+    for c in clarifications:
+        result.append(
+            ClarificationListItem(
+                id=str(c.get("_id")),
+                question=c.get("question"),
+                options=c.get("options", []),
+                status=c.get("status", "pending"),
+                priority=c.get("priority", "medium"),
+                created_at=_iso(c.get("created_at")),
+                resolved_at=_iso(c.get("resolved_at")),
+            )
+        )
+    return ClarificationListResponse(clarifications=result)
 
 
 app.include_router(router)

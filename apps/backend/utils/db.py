@@ -250,3 +250,28 @@ async def fetch_report(report_id: str, user: str) -> dict:
     else:
         result["contract"] = None
     return serialize_document(result)
+
+
+async def get_all_clarifications(user: str) -> list:
+    cursor = clarifications_collection.find({"user": ObjectId(user)})
+    results = await cursor.to_list(length=100)
+    for c in results:
+        # Add all the optional fields for richer clarifications
+        c["options"] = c.get("options", [])
+        c["answer"] = c.get("answer", None)
+        c["category"] = c.get("category", None)
+        c["portia_plan_run_id"] = c.get("portia_plan_run_id", None)
+        c["portia_clarification_id"] = c.get("portia_clarification_id", None)
+        c["step"] = c.get("step", None)
+        c["argument_name"] = c.get("argument_name", None)
+    for item in results:
+        contract_id = item["contract_id"]
+        item["contract_id"] = str(contract_id)
+
+        # Fetch the contract information
+        contract = await contracts_collection.find_one({"_id": contract_id})
+        if contract:
+            item["contract"] = serialize_document(contract)
+        else:
+            item["contract"] = None
+    return serialize_document(results)
